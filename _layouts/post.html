@@ -14,10 +14,10 @@ layout: default
 
   <nav>
     {% if page.previous %}
-    <a href="{{ page.previous.url }}" title="{{ page.previous.title }}">&larr; Previous Post</a>
+    <a href="{{ page.previous.url | prepend: site.baseurl }}" title="{{ page.previous.title }}">&larr; Previous Post</a>
     {% endif %}
     {% if page.next %}
-    <a href="{{ page.next.url }}" title="{{ page.next.title }}">Next Post &rarr;</a>
+    <a href="{{ page.next.url | prepend: site.baseurl }}" title="{{ page.next.title }}">Next Post &rarr;</a>
     {% endif %}
   </nav>
 
