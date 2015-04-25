@@ -2,8 +2,8 @@
 title: zodiac
 email: wxlgame0105@gmail.com
 description: we are young we are strong
-baseurl: "/blog" # the subpath of your site, e.g. /blog/
-url: "http://zodiac-xl.github.io" # the base hostname & protocol for your site
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://zodiac-xl.github.io/blog" # the base hostname & protocol for your site
 twitter_username: zodiac
 github_username:  zodiac
 
