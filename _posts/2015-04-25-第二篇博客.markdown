@@ -1,0 +1,10 @@
+---
+layout: post
+title:  "我的第一篇博客"
+date:   2015-04-25 14:23:45
+categories: test test2
+comments: true
+---
+我是摘要
+<!--more-->
+这是我的第二篇博客，请大家多多指教

@@ -1,0 +1,30 @@
+# Site settings
+title: zodiac
+email: wxlgame0105@gmail.com
+description: we are young we are strong
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://zodiac-xl.github.io/blog" # the base hostname & protocol for your site
+twitter_username: zodiac
+github_username:  zodiac
+
+# Build settings
+markdown: kramdown
+
+
+# other settings
+excerpt_separator: "<!--more-->"
+paginate: 5
+paginate_path: "page:num"
+
+
+
+duoshuo_shortname: "zodiacblog"
+
+
+owner:
+  name: "zodiac|吴小龙"
+
+
+safe: false
+
+category_title_prefix: ""
