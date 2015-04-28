@@ -3,10 +3,9 @@ layout: default
 ---
 
 <div class="home">
-
   <h1 class="page-heading">Posts</h1>
 
-
+  {{ site | tag_cloud }}
   <ul class="post-list">
     {% if site.paginate %}
     {% for post in paginator.posts %}
@@ -16,11 +15,7 @@ layout: default
       <h2>
         <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
       </h2>
-      {% if site.excerpt_separator %}
       <p>{{ post.excerpt }}<p>
-      {% else %}
-      <p>{{ post.content }}</p>
-      {% endif %}
     </li>
     {% endfor %}
     <div class="pagination">
@@ -53,6 +48,5 @@ layout: default
   </ul>
 
   <p class="rss-subscribe">rss <a href="{{ "/rss.xml" | prepend: site.baseurl }}">via RSS</a></p>
-  <p class="atom-subscribe">atom <a href="{{ "/atom.xml" | prepend: site.baseurl }}">via ATOM</a></p>
 
 </div>

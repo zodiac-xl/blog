@@ -1,30 +1,66 @@
 # Site settings
-title: zodiac
+name: 小龙の博客
+title: zodiac's blog
 email: wxlgame0105@gmail.com
+author: zodiac|小龙
 description: we are young we are strong
+copyright: Copyright@2015,Zodiac
+rss_post_limit: 1000
 baseurl: "/blog" # the subpath of your site, e.g. /blog/
 url: "http://zodiac-xl.github.io" # the base hostname & protocol for your site
-twitter_username: zodiac
-github_username:  zodiac
+source: .
+Destination: ./_site
+plugins: ./_plugins
+layouts: ./_layouts
+include: ['.htaccess','assets']
+exclude: []
+keep_files: ['.git','.svn']
+timezone: nil
+Encoding: utf-8
+twitter_username: Zodiac_Wu
+github_username:  zodiac-xl
 
 # Build settings
 markdown: kramdown
-
+dest_prefix: ""
 
 # other settings
+
+#开启插件
+safe: false
+
+
+sitemap:
+    file: "/sitemap.xml"
+    exclude:
+        - "/atom.xml"
+        - "/feed.xml"
+        - "/feed/index.xml"
+    include_posts:
+        - "/index.html"
+    change_frequency_name: "change_frequency"
+    priority_name: "priority"
+
+#摘要分隔符
 excerpt_separator: "<!--more-->"
+
+#翻页
 paginate: 2
 paginate_path: "page:num"
 
 
+tag_page_layout: tag_page
+tag_page_dir: tag
+tag_permalink_style: pretty
 
+
+ignored_tags: []
+
+#评论
 duoshuo_shortname: "zodiacblog"
-
-
 owner:
-  name: "zodiac|吴小龙"
+  name: "zodiac|小龙"
 
 
-safe: false
-
+#分类前缀设置
 category_title_prefix: ""

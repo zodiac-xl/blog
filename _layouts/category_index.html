@@ -16,9 +16,7 @@ layout: default
       <h2>
         <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
       </h2>
-      {% if site.excerpt_separator %}
       <p>{{ post.excerpt }}<p>
-      {% endif %}
     </li>
     {% endfor %}
     <div class="pagination">

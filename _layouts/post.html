@@ -9,6 +9,7 @@ layout: default
   </header>
 
   <article class="post-content">
+    <p>This article will take {{ content | reading_time | pluralize: "minute" }} minutes to read.</p>
     {{ content }}
   </article>
 

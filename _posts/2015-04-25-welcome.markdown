@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Welcome to Jekyll!"
+date:   2015-04-25 14:23:45
+categories: jekyll
+---
+我是摘要
+<!--more-->
+欢迎使用jekyll
