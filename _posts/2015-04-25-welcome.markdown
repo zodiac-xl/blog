@@ -2,7 +2,7 @@
 layout: post
 title:  "Welcome to Jekyll!"
 date:   2015-04-25 14:23:45
-categories: jekyll
+categories: jekyll 2
 ---
 我是摘要
 <!--more-->
