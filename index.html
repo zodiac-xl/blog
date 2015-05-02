@@ -1,52 +1,56 @@
 ---
 layout: default
 ---
-
 <div class="home">
-  <h1 class="page-heading">Posts</h1>
+    <h1 class="page-heading">Posts</h1>
 
-  {{ site | tag_cloud }}
-  <ul class="post-list">
-    {% if site.paginate %}
-    {% for post in paginator.posts %}
-    <li>
-      <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+    <ul class="post-list">
+        {% if site.paginate %}
 
-      <h2>
-        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-      </h2>
-      <p>{{ post.excerpt }}<p>
-    </li>
-    {% endfor %}
-    <div class="pagination">
-      {% if paginator.previous_page %}
-      <a href="{{ paginator.previous_page_path | prepend: site.baseurl }}" class="previous">Previous</a>
-      {% else %}
-      <span class="previous">Previous</span>
-      {% endif %}
-      <span class="page_number ">Page: {{ paginator.page }} of {{ paginator.total_pages }}</span>
-      {% if paginator.next_page %}
-      <a href="{{ paginator.next_page_path | prepend: site.baseurl }}" class="next">Next</a>
-      {% else %}
-      <span class="next ">Next</span>
-      {% endif %}
-    </div>
-    {% else %}
-    {% for post in site.posts %}
-    <li>
-      <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+        {% for post in paginator.posts %}
+        <li>
+            <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+            <h2>
+                <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+            </h2>
+            {% if site.excerpt_separator %}
+            <p>{{ post.excerpt }}<p>
+            {% endif %}
+        </li>
+        {% endfor %}
 
-      <h2>
-        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-      </h2>
-      {% if site.excerpt_separator %}
-      <p>{{ post.excerpt }}<p>
-      {% endif %}
-    </li>
-    {% endfor %}
-    {% endif %}
-  </ul>
+        <div class="pagination">
+            {% if paginator.previous_page %}
+            <a href="{{ paginator.previous_page_path | prepend: site.baseurl }}" class="previous">Previous</a>
+            {% else %}
+            <span class="previous">Previous</span>
+            {% endif %}
+            <span class="page_number ">Page: {{ paginator.page }} of {{ paginator.total_pages }}</span>
+            {% if paginator.next_page %}
+            <a href="{{ paginator.next_page_path | prepend: site.baseurl }}" class="next">Next</a>
+            {% else %}
+            <span class="next ">Next</span>
+            {% endif %}
+        </div>
+        {% else %}
+        {% for post in site.posts %}
+        <li>
+            <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
 
-  <p class="rss-subscribe">rss <a href="{{ "/rss.xml" | prepend: site.baseurl }}">via RSS</a></p>
+            <h2>
+                <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+            </h2>
+            {% if site.excerpt_separator %}
+            <p>
+                {{ post.excerpt }}
+
+            <p>
+                {% endif %}
+        </li>
+        {% endfor %}
+        {% endif %}
+    </ul>
+
+    <p class="rss-subscribe">rss <a href="{{ "/rss.xml" | prepend: site.baseurl }}">via RSS</a></p>
 
 </div>
