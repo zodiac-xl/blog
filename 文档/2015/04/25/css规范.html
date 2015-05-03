@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>css规范</title>
+  <meta name="description" content="">
+
+  <link rel="stylesheet" href="/blog/css/main.css">
+  <link rel="canonical" href="http://zodiac-xl.github.io/blog/%E6%96%87%E6%A1%A3/2015/04/25/css%E8%A7%84%E8%8C%83.html">
+  <link rel="alternate" type="application/rss+xml" title="zodiac's blog" href="http://zodiac-xl.github.io/blog/rss.xml" />
+  <link href="http://zodiac-xl.github.io/blog/rss.xml" type="application/atom+xml" rel="alternate" title="zodiac's blog">
+</head>
+
+
+<body>
+<header class="site-header">
+
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">zodiac's blog</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/blog/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+          <a class="page-link" href="/blog/categories/%E6%96%87%E6%A1%A3/index.html">文档</a>
+          
+        
+          
+          <a class="page-link" href="/blog/categories/zodiac/index.html">zodiac</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+  </div>
+</header>
+
+
+<div class="page-content">
+    <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">css规范</h1>
+    <p class="post-meta">Apr 25, 2015</p>
+  </header>
+  <a href="/blog/tag/css/" class="set-5">css</a> <a href="/blog/tag/%E5%B7%A5%E4%BD%9C/" class="set-5">工作</a> <a href="/blog/tag/%E7%94%9F%E6%B4%BB/" class="set-5">生活</a>
+  <article class="post-content">
+    <p><span class="number">447</span> words will take about <span class="number">3</span> minutes to read</p>
+    <!--more-->
+
+<p>一、文件规范</p>
+
+<p>1、文件均归档至约定的目录中
+所有的CSS分为两大类：通用类和业务类。通用的CSS文件，放在如下目录中：</p>
+
+<p>基本样式库 /css/core
+通用UI元素样式库 /css/lib
+JS组件相关样式库 /css/ui
+业务类的CSS是指和具体产品相关的文件，放在如下目录中：</p>
+
+<p>读书 /css/book/
+电影 /css/movie/
+音乐 /css/music/
+社区 /css/sns/
+小站 /css/site/
+同城 /css/location/
+电台 /css/radio/
+外联CSS文件适用于全站级和产品级通用的大文件。内联CSS文件适用于在一个或几个页面共用的CSS。另外一对具体的CSS进行文档化的整理。如：</p>
+
+<p>util-01 reset /css/core/reset.css
+util-02 通用模块容器 /css/core/mod.css
+ui-01. 喜欢按钮 /css/core/fav<em>btn.css
+ui-02. 视频/相册列表项 /css/core/media</em>item.css
+ui-03. 评星 /css/core/rating.css
+ui-04. 通用按钮 /css/core/common_button.css
+ui-05. 分页 /css/core/pagination.css
+2、文件引入可通过外联或内联方式引入
+link和style标签都应该放入head中，原则上，不允许在html上直接写样式。避免在CSS中使用@import，嵌套不要超过一层。</p>
+
+<p>外联方式：<link rel=”stylesheet” href=”…” />（类型声明type=”text/css”可以省略）
+内联方式：<style>…</style> （类型声明type=”text/css”可以省略）
+3、文件名、文件编码及文件大小</p>
+
+<p>文件名必须由小写字母、数字、中划线组成
+文件必须用UTF-8编码，使用UTF-8（非BOM），在HTML中指定UTF-8编码，在CSS中则不需要特别指定因为默认就是UTF-8。
+单个CSS文件避免过大（建议少于300行）
+二、注释规范</p>
+
+<p>1、文件顶部注释（推荐使用）</p>
+
+<p>Css代码</p>
+
+<p>/*
+* @description: 中文说明
+* @author: name
+* @update: name (2013-04-13 18:32)
+*/
+2、模块注释
+模块注释必须单独写在一行</p>
+
+<p>Css代码</p>
+
+<p>/* module: module1 by 张三 <em>/
+…
+/</em> module: module2 by 张三 */
+3、单行注释与多行注释
+单行注释可以写在单独一行，也可以写在行尾，注释中的每一行长度不超过40个汉字，或者80个英文字符。</p>
+
+<p>Css代码</p>
+
+<p>/* this is a short comment */
+多行注释必须写在单独行内</p>
+
+<p>Css代码</p>
+
+<p>/*
+* this is comment line 1.
+* this is comment line 2.
+*/
+4、特殊注释
+用于标注修改、待办等信息</p>
+
+<p>Css代码</p>
+
+<p>/* TODO: xxxx by name 2013-04-13 18:32 <em>/
+/</em> BUGFIX: xxxx by name 2012-04-13 18:32 */
+5、区块注释
+对一个代码区块注释（可选），将样式语句分区块并在新行中对其注释。</p>
+
+<p>Css代码</p>
+
+<p>/* Header <em>/
+/</em> Footer <em>/
+/</em> Gallery */
+三、命名规范</p>
+
+<p>使用有意义的或通用的ID和class命名：ID和class的命名应反映该元素的功能或使用通用名称，而不要用抽象的晦涩的命名。反映元素的使用目的是首选；使用通用名称代表该元素不表特定意义，与其同级元素无异，通常是用于辅助命名；使用功能性或通用的名称可以更适用于文档或模版变化的情况。</p>
+
+<p>/* 不推荐: 无意义 <em>/ #yee-1901 {}
+/</em> 不推荐: 与样式相关 <em>/ .button-green {}.clear {}
+/</em> 推荐: 特殊性 <em>/ #gallery {}#login {}.video {}
+/</em> 推荐: 通用性 */ .aux {}.alt {}
+常用命名（多记多查英文单词）：page、wrap、layout、header(head)、footer(foot、ft)、content(cont)、menu、nav、main、submain、sidebar(side)、logo、banner、title(tit)、popo(pop)、icon、note、btn、txt、iblock、window(win)、tips等。
+ID和class命名越简短越好，只要足够表达涵义。这样既有助于理解，也能提高代码效率。</p>
+
+<p>/* 不推荐 <em>/ #navigation {}.atr {}
+/</em> 推荐 */ #nav {}.author {}
+类型选择器避免同时使用标签、ID和class作为定位一个元素选择器；从性能上考虑也应尽量减少选择器的层级。</p>
+
+<p>/* 不推荐 <em>/ul#example {}div.error {}
+/</em> 推荐 */#example {}.error {}</p>
+
+<p>命名时需要注意的点：</p>
+
+<p>规则命名中，一律采用小写加中划线的方式，不允许使用大写字母或 _
+命名避免使用中文拼音，应该采用更简明有语义的英文单词进行组合
+命名注意缩写，但是不能盲目缩写，具体请参见常用的CSS命名规则
+不允许通过1、2、3等序号进行命名
+避免class与id重名
+id用于标识模块或页面的某一个父容器区域，名称必须唯一，不要随意新建id
+class用于标识某一个类型的对象，命名必须言简意赅。
+尽可能提高代码模块的复用，样式尽量用组合的方式
+规则名称中不应该包含颜色（red/blue）、定位（left/right）等与具体显示效果相关的信息。应该用意义命名，而不是样式显示结果命名。
+1、常用id的命名：
+(1) 页面结构</p>
+
+<p>容器: container
+页头：header
+内容：content/container
+页面主体：main
+页尾：footer
+导航：nav
+侧栏：sidebar
+栏目：column
+页面外围控制整体布局宽度：wrapper
+左右中：left right center
+(2) 导航</p>
+
+<p>导航：nav
+主导航：mainbav
+子导航：subnav
+顶导航：topnav
+边导航：sidebar
+左导航：leftsidebar
+右导航：rightsidebar
+菜单：menu
+子菜单：submenu
+标题: title
+摘要: summary
+(3) 功能</p>
+
+<p>标志：logo
+广告：banner
+登陆：login
+登录条：loginbar
+注册：regsiter
+搜索：search
+功能区：shop
+标题：title
+加入：joinus
+状态：status
+按钮：btn
+滚动：scroll
+标签页：tab
+文章列表：list
+提示信息：msg
+当前的: current
+小技巧：tips
+图标: icon
+注释：note
+指南：guild
+服务：service
+热点：hot
+新闻：news
+下载：download
+投票：vote
+合作伙伴：partner
+友情链接：link
+版权：copyright
+2、常用class的命名：
+(1) 颜色:使用颜色的名称或者16进制代码，如</p>
+
+<p>.red { color: red; }
+.f60 { color: #f60; }
+.ff8600 { color: #ff8600; }
+(2) 字体大小,直接使用”font+字体大小”作为名称，如</p>
+
+<p>.font12px { font-size: 12px; }
+.font9pt {font-size: 9pt; }
+(3) 对齐样式,使用对齐目标的英文名称，如</p>
+
+<p>.left { float:left; }
+.bottom { float:bottom; }
+(4) 标题栏样式,使用”类别+功能”的方式命名，如</p>
+
+<p>.barnews { }
+.barproduct { }
+四、书写规范</p>
+
+<p>1、排版规范
+(1) 使用4个空格，而不使用tab或者混用空格+tab作为缩进；
+(2) 规则可以写成单行，或者多行，但是整个文件内的规则排版必须统一；
+单行形式书写风格的排版约束：</p>
+
+<p>如果是在html中写内联的css，则必须写成单行；
+每一条规则的大括号 { 前后加空格 ；
+每一条规则结束的大括号 } 前加空格；
+属性名冒号之前不加空格，冒号之后加空格；
+每一个属性值后必须添加分号; 并且分号后空格；
+多个selector共用一个样式集，则多个selector必须写成多行形式 ；
+多行形式书写风格的排版约束：</p>
+
+<p>每一条规则的大括号 { 前添加空格；
+多个selector共用一个样式集，则多个selector必须写成多行形式；
+每一条规则结束的大括号 } 必须与规则选择器的第一个字符对齐；
+属性名冒号之前不加空格，冒号之后加空格；
+属性值之后添加分号；
+2、属性编写顺序</p>
+
+<p>显示属性：display/list-style/position/float/clear …
+自身属性（盒模型）：width/height/margin/padding/border
+背景：background
+行高：line-height
+文本属性：color/font/text-decoration/text-align/text-indent/vertical-align/white-space/content…
+其他：cursor/z-index/zoom/overflow
+CSS3属性：transform/transition/animation/box-shadow/border-radius
+如果使用CSS3的属性，如果有必要加入浏览器前缀，则按照 -webkit- / -moz- / -ms- / -o- / std的顺序进行添加，标准属性写在最后。
+链接的样式请严格按照如下顺序添加： a:link -&gt; a:visited -&gt; a:hover -&gt; a:active
+3、规则书写规范</p>
+
+<p>使用单引号，不允许使用双引号;
+每个声明结束都应该带一个分号，不管是不是最后一个声明;
+除16进制颜色和字体设置外，CSS文件中的所有的代码都应该小写;
+除了重置浏览器默认样式外，禁止直接为html tag添加css样式设置;
+每一条规则应该确保选择器唯一，禁止直接为全局.nav/.header/.body等类设置属性;
+4、代码性能优化</p>
+
+<p>合并margin、padding、border的-left/-top/-right/-bottom的设置，尽量使用短名称。
+选择器应该在满足功能的基础上尽量简短，减少选择器嵌套，查询消耗。但是一定要避免覆盖全局样式设置。
+注意选择器的性能，不要使用低性能的选择器。
+禁止在css中使用*选择符。
+除非必须，否则，一般有class或id的，不需要再写上元素对应的tag。
+0后面不需要单位，比如0px可以省略成0，0.8px可以省略成.8px。
+如果是16进制表示颜色，则颜色取值应该大写。
+如果可以，颜色尽量用三位字符表示，例如#AABBCC写成#ABC 。
+如果没有边框时，不要写成border:0，应该写成border:none 。
+尽量避免使用AlphaImageLoader 。
+在保持代码解耦的前提下，尽量合并重复的样式。
+background、font等可以缩写的属性，尽量使用缩写形式 。
+5、CSS Hack的使用</p>
+
+<p>请不用动不动就使用浏览器检测和CSS Hacks，先试试别的解决方法吧！考虑到代码高效率和易管理，虽然这两种方法能快速解决浏览器解析差异，但应被视为最后的手段。在长期的项目中，允许使用hack只会带来更多的hack，你越是使用它，你越是会依赖它！
+推荐使用下面的：</p>
+
+<p>6、字体规则</p>
+
+<p>为了防止文件合并及编码转换时造成问题，建议将样式中文字体名字改成对应的英文名字，如：黑体(SimHei) 宋体(SimSun) 微软雅黑 (Microsoft Yahei，几个单词中间有空格组成的必须加引号)
+字体粗细采用具体数值，粗体bold写为700，正常normal写为400
+font-size必须以px或pt为单位，推荐用px（注：pt为打印版字体大小设置），不允许使用xx-small/x-small/small/medium/large/x-large/xx-large等值
+为了对font-family取值进行统一，更好的支持各个操作系统上各个浏览器的兼容性，font-family不允许在业务代码中随意设置</p>
+
+<p>五、测试规范</p>
+
+<p>1、了解浏览器特效支持
+为了页面性能考虑，如果浏览器不支持CSS3相关属性的，则该浏览器的某些特效将不再支持，属性的支持情况如下表所示（Y为支持，N为不支持）：</p>
+
+<p>2、 设定浏览器支持标准</p>
+
+<p>A级－交互和视觉完全符全设计的要求
+B级－视觉上允许有所差异，但不破坏页面的整体效果
+C级－可忽略设计上的细节，但不防碍使用
+3、常用样式测试工具</p>
+
+<p>W3C CSS validator：http://jigsaw.w3.org/css-validator/
+CSS Lint：http://csslint.net/
+CSS Usage：https://addons.mozilla.org/en-us/firefox/addon/css-usage/</p>
+
+<p>六、其他规范</p>
+
+<p>不要轻易改动全站级CSS和通用CSS库。改动后，要经过全面测试。
+避免使用filter
+避免在CSS中使用expression
+避免过小的背景图片平铺。
+尽量不要在CSS中使用!important
+绝对不要在CSS中使用”*”选择符
+层级(z-index)必须清晰明确，页面弹窗、气泡为最高级（最高级为999），不同弹窗气泡之间可在三位数之间调整；普通区块为10-90内10的倍数；区块展开、弹出为当前父层级上个位增加，禁止层级间盲目攀比。
+背景图片请尽可能使用sprite技术, 减小http请求, 考虑到多人协作开发, sprite按照模块、业务、页面来划分均可。</p>
+
+  </article>
+
+  <nav>
+    
+    
+    <a href="/blog/zodiac/2015/04/25/%E7%AC%AC%E4%BA%8C%E7%AF%87%E5%8D%9A%E5%AE%A2.html" title="我的第二篇博客">Next Post &rarr;</a>
+    
+  </nav>
+
+</div>
+
+    </div>
+</div>
+
+<footer class="site-footer">
+    <div class="wrapper">
+        <div class="footer-col-wrapper">
+            <div class="footer-col  footer-col-1">
+                <ul class="contact-list">
+                    <li>zodiac's blog</li>
+                    <li><a href="mailto:wxlgame0105@gmail.com">wxlgame0105@gmail.com</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col  footer-col-2">
+                <ul class="social-media-list">
+                    
+                    <li>
+                        <a href="https://github.com/zodiac-xl">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                    <path fill="#828282"
+                          d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+                            <span class="username">zodiac-xl</span>
+                        </a>
+                    </li>
+                    
+
+                    
+                    <li>
+                        <a href="https://twitter.com/Zodiac_Wu">
+              <span class="icon  icon--twitter">
+                <svg viewBox="0 0 16 16">
+                    <path fill="#828282"
+                          d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/>
+                </svg>
+              </span>
+
+                            <span class="username">Zodiac_Wu</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </div>
+
+            <div class="footer-col  footer-col-3">
+                <p class="text">we are young we are strong</p>
+            </div>
+        </div>
+    </div>
+</footer>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-62360771-1', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+
+
+</body>
+</html>
+
