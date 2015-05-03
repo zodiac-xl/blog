@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>文档</title>
-  <meta name="description" content="we are young we are strong">
+  <title>容易被忽略的css特性</title>
+  <meta name="description" content="">
 
   <link rel="stylesheet" href="/blog/css/main.css">
-  <link rel="canonical" href="http://zodiac-xl.github.io/blog/categories/%E6%96%87%E6%A1%A3/">
+  <link rel="canonical" href="http://zodiac-xl.github.io/blog/%E6%96%87%E6%A1%A3/2015/04/25/%E5%AE%B9%E6%98%93%E8%A2%AB%E5%BF%BD%E7%95%A5%E7%9A%84css%E7%89%B9%E6%80%A7.html">
   <link rel="alternate" type="application/rss+xml" title="zodiac's blog" href="http://zodiac-xl.github.io/blog/rss.xml" />
   <link href="http://zodiac-xl.github.io/blog/rss.xml" type="application/atom+xml" rel="alternate" title="zodiac's blog">
 </head>
@@ -61,62 +61,55 @@
 
 <div class="page-content">
     <div class="wrapper">
-        <div class="home">
+        <div class="post">
 
-  <h1 class="page-heading">Posts</h1>
+  <header class="post-header">
+    <h1 class="post-title">容易被忽略的css特性</h1>
+    <p class="post-meta">Apr 25, 2015</p>
+  </header>
+  <article class="post-content">
+    <p><span class="number">28</span> words will take about <span class="number">1</span> minutes to read</p>
+    <!--more-->
 
 
-  <ul class="post-list">
+<h3>一、层叠等级</h3>
+
+<ul>
+<li>原则一：继承不如指定</li>
+<li>原则二：#id>.class>标签选择器</li>
+<li>原则三：越具体越强大</li>
+<li>原则四：标签#id>#id; 标签.class>.class</li>
+<li>原则五：原则一>原则二>原则三>原则四</li>
+</ul>
+
+
+<h3>二、:checked选择器范围</h3>
+
+<ul>
+<li>熟知的 :checked会选择被选中的checkbox radio</li>
+<li>不常见的 option被选择也会应用:checked</li>
+</ul>
+
+
+<h3>三、并不是所有的图片都会被加载</h3>
+
+<ul>
+<li><p>写在页面上的img标签，无论显示与否，图片都会被加载</p></li>
+<li><p>而使用backgroung-image等css属性为页面添加图片，这些图片不是一定会被加载。</p></li>
+<li>没有用到的CSS和父容器的display被设为none的情况，这两种情况下的CSS引用的图片是不会被加载的，而父容器设置visibility属性为hidden仍然会加载图片</li>
+</ul>
+
+
+  </article>
+
+  <nav>
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/04/25/css%E8%A7%84%E8%8C%83.html" title="css规范">&larr; Previous Post</a>
     
     
-    <li>
-      <span class="post-meta">Apr 25, 2015</span>
-
-      <h2>
-        <a class="post-link" href="/blog/%E6%96%87%E6%A1%A3/2015/04/25/%E5%B8%B8%E7%94%A8CSS%E4%BC%98%E5%8C%96%E6%80%BB%E7%BB%93%E2%80%94%E2%80%94%E7%BD%91%E7%BB%9C%E6%80%A7%E8%83%BD%E4%B8%8E%E8%AF%AD%E6%B3%95%E6%80%A7%E8%83%BD%E5%BB%BA%E8%AE%AE.html">常用CSS优化总结——网络性能与语法性能建议</a>
-      </h2>
-      <p>
-
-<p>
-    </li>
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/04/25/%E5%B8%B8%E7%94%A8CSS%E4%BC%98%E5%8C%96%E6%80%BB%E7%BB%93%E2%80%94%E2%80%94%E7%BD%91%E7%BB%9C%E6%80%A7%E8%83%BD%E4%B8%8E%E8%AF%AD%E6%B3%95%E6%80%A7%E8%83%BD%E5%BB%BA%E8%AE%AE.html" title="常用CSS优化总结——网络性能与语法性能建议">Next Post &rarr;</a>
     
-    <li>
-      <span class="post-meta">Apr 25, 2015</span>
-
-      <h2>
-        <a class="post-link" href="/blog/%E6%96%87%E6%A1%A3/2015/04/25/%E5%AE%B9%E6%98%93%E8%A2%AB%E5%BF%BD%E7%95%A5%E7%9A%84css%E7%89%B9%E6%80%A7.html">容易被忽略的css特性</a>
-      </h2>
-      <p>
-
-<p>
-    </li>
-    
-    <li>
-      <span class="post-meta">Apr 25, 2015</span>
-
-      <h2>
-        <a class="post-link" href="/blog/%E6%96%87%E6%A1%A3/2015/04/25/css%E8%A7%84%E8%8C%83.html">css规范</a>
-      </h2>
-      <p>文件规范 注释规范 命名规范 书写规范
-
-
-<p>
-    </li>
-    
-    <div class="pagination">
-      
-      <span class="previous">Previous</span>
-      
-      <span class="page_number ">Page:  of </span>
-      
-      <span class="next ">Next</span>
-      
-    </div>
-    
-  </ul>
-
-  <p class="rss-subscribe">rss <a href="/blog/rss.xml">via RSS</a></p>
-  <p class="atom-subscribe">atom <a href="/blog/atom.xml">via ATOM</a></p>
+  </nav>
 
 </div>
 
