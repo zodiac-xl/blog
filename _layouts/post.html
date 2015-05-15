@@ -7,12 +7,9 @@ layout: default
     <h1 class="post-title">{{ page.title }}</h1>
     <p class="post-meta">{{ page.date | date: "%b %-d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}</p>
   </header>
-  {{ site | tag_cloud }}
   <article class="post-content">
-    <p><span class="number">{{ page.content | number_of_words }}</span> words will take about <span class="number">{{ content | reading_time | pluralize: "minute" }}</span> minutes to read</p>
     {{ content }}
   </article>
-
   <nav>
     {% if page.previous %}
     <a href="{{ page.previous.url  | prepend: site.baseurl }}" title="{{ page.previous.title }}">&larr; Previous Post</a>

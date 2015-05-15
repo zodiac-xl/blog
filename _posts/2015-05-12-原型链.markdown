@@ -1,0 +1,72 @@
+---
+layout: post
+title:  "原型链"
+date:   2015-05-12 20:16:33
+categories: 文档
+tags: js
+---
+<!--more-->
+###JavaScript中`prototype`、`__proto__`、`Function`、`Object`等
+
+`__proto__`和`prototype`的关系:
+
+`__proto__`是原型而`prototype`是一个原型引用属性
+
+1. 一个function的原型(`__proto__`)实际上是它的父类的`prototype`属性，而不是它自己的`prototype`属性（显示原型）
+2. `__proto__`才是真正的原型 只是它是私有属性 我们一般不使用它 （隐式原型）
+
+
+先看下new方法的具体过程。
+
+	var Person = function () { };
+	var p = new Person();
+	alert(p.__proto__ === Person.prototype);//true
+
+new的过程拆分成以下三步:
+
+1. `var p={}`; 也就是说，初始化一个对象p。
+2. `p.__proto__=Person.prototype`;//p是Person的派生类 Person是p的父类
+3. `Person.call(p)`;也就是说构造p，也可以称之为初始化p
+
+
+每个对象都会在其内部初始化一个属性，就是`__proto__` ，当我们访问一个对象的一个属性时，如果这个对象内部不存在这个属性，那么他就会去`__proto__` 里找这个属性，这个`__proto__`又会有自己的 `__proto__`，于是就这样一直找下去，也就是我们平时所说的原型链的概念。
+
+按照标准， `__proto__`是不对外公开的，也就是说是个私有属性，但是Firefox的引擎将他暴露了出来成为了一个共有的属性，我们可以对外访问和设置。
+
+其实`prototype`只是一个假象，他在实现原型链中只是起到了一个辅助作用，换句话说，他只是在new的时候有着一定的价值，而原型链的本质，其实在于`__proto__`！`prototype`返回的其实是原型`__proto__`的引用，并不是真正的原型
+
+
+Function和Object是js中的两个内置对象。js中包括Function在内的所有都是一个Object
+Function 本身也是一个“类”，然而，所有“类”都是Function的实例，于是 Function instanceof Function为true。同时，所有对象都是 Object 类的实例，Object 本身也是一个对象，所有又有 Object instanceof Object 也为 true。另外，还可以认为 Funciton 类型是`Object`类型的一个“派生类”，**class Function继承了class Object**，是class Object的一个“子类”
+
+结论：
+
+1. javaScript中一切皆为对象；所有数据类型都是从Object派生出来的（包括Funciton） Object的原型是所有父原型的顶端,它不再具有父原型,所以结果为null;
+2. prototype是只有Object和Function及Function的实例才有的一个属性 一个function的派生类的原型指向这个function的prototype属性 说到底prototype也只有在函数new或者原型继承的时候才用的到
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

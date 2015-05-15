@@ -21,7 +21,7 @@ twitter_username: Zodiac_Wu
 github_username:  zodiac-xl
 
 # Build settings
-markdown: kramdown
+markdown: RDiscount
 dest_prefix: ""
 
 # other settings
@@ -45,7 +45,7 @@ sitemap:
 excerpt_separator: "<!--more-->"
 
 #翻页
-paginate: 2
+paginate: 10
 paginate_path: "page:num"
 
 
