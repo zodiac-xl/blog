@@ -1,0 +1,117 @@
+---
+layout: post
+title:  "web通信"
+date:   2015-05-19 23:13:42
+categories: 文档
+tags: js
+---
+<!--more-->
+
+###AJAX
+异步JavaScript和XML
+
+ajax的核心是通过XmlHttpRequest获取非本页内
+
+>通过在后台与服务器进行少量数据交换，AJAX 可以使网页实现异步更新。这意味着可以在不重新加载整个网页的情况下，对网页的某部分进行更新。
+
+
+###跨域请求
+
+####服务端和客户端约定 XHR按照CORS规范要求服务器发送特定的http头
+
+>
+客户端设置Origin:http://www.zodiac.com
+>
+服务端设置Access-Control-Allow-Origin:http://www.zodiac.com或者Access-Control-Allow-Origin:*
+
+
+
+	header('Access-Control-Allow-Origin: *');
+	header('Access-Control-Allow-Methods: GET, POST');
+
+
+####其他跨域技术
+>
+背景：Web页面上调用js文件时则不受是否跨域的影响,凡是拥有"src"这个属性的标签都拥有跨域的能力，比如`<script>`、`<img>`、`<iframe>`等
+
+
+#####图像Ping 使用<img>标签
+
+	var url = "http://www.dell.com/?name=zodiac";
+    function imgPing( url, callBack ) {
+        var img = new Image();
+        img.onload = img.onerror = callBack;
+        img.src = url;
+    }
+    imgPing( url, function () {
+    } );
+
+> 通常用来跟踪用户点击页面或者广告的曝光次数
+
+>优点：不修改服务器代码  简单 单向
+
+>不足：1只能发送GET请求 2无法访问服务器的响应脚本 只是浏览器与服务器间的单向通行
+
+
+#####JSONP协议(建议使用XHR按照CORS规范代替)
+该协议的一个要点就是允许用户传递一个callback参数给服务端，然后服务端返回数据时会将这个callback参数作为函数名来包裹住JSON数据，这样客户端就可以随意定制自己的函数来自动处理返回数据了。
+
+>
+jsonp的核心是动态添加`<script>`标签来调用服务器提供的js脚本
+
+>
+jsonP本身就是一个get请求，而script节点本身也是一个get请求，这个思想是利用`<script>`标签没有跨域限制的“漏洞”,通过后端的配合（后端输出的 response text必须符合js语法）更好的利用了get请求。
+>
+前端封装一个方法，通过这个方法把请求注册的回调指向全局的一个具名函数，同时把具名函数的函数名和参数通过get请求传递给后端。来达到与第三方通讯的目的。
+
+
+
+当需要通讯时，本站脚本创建一个`<script>`元素，地址指向第三方的API网址，形如：
+
+	<script src="http://www.example.net/api?param1=1&param2=2"></script>
+
+并提供一个回调函数来接收数据（函数名可约定，或通过地址参数传递）。
+第三方产生的响应为json数据的包装（故称之为jsonp，即json padding），形如：
+
+	callback({"name":"hax","gender":"Male"})
+
+这样浏览器会调用callback函数，并传递解析后json对象作为参数。本站脚本可在callback函数里处理所传入的数据。
+
+
+
+####Web Sockets 全双工 双向的通信 使用自定义协议ws 而不是使用http协议 ie不支持
+Web Sockets用于浏览器和服务器的通信
+
+同源策略对socket不适用 因此可以通过socket打开任何站点链接
+
+    var socket = new WebSocket( "ws://www.zodiac.com/service" );
+
+    //只能发送纯文本 可以使用JSON.stringify 字符串化
+    socket.send( "Hello World" );
+
+    socket.onmessage = function ( event ) {
+        var data = event.data;
+    };
+    socket.onclose = function ( event ) {
+        console.log( event.wasClean + "  " + event.code + "   " + event.reason );
+    };
+
+
+####web message
+用于浏览器窗口之间的通信
+
+	 var iframeWindow = document.querySelector("iframe").contentWindow;
+
+    //向iframeWindow发送的信息和表明自己身份
+    iframeWindow.postMessage("a message", "http://www.webMessagePost.com");
+
+
+    //监控信息
+    W.addHandler(window, "message", function (event) {
+        if (event.origin == "http://www.webMessagePost.com") { //验证发送消息的域是已知的域
+            var data = event.data; //do something
+
+            //可选:向来源窗口发送回执
+            event.source.postMessage("I received your present", "http://www.hello.com");
+        }
+    })

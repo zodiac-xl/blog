@@ -1,0 +1,17 @@
+---
+layout: post
+title:  "css规范"
+date:   2015-05-18 20:12:22
+categories: 文档
+tags: js
+---
+<!--more-->
+
+ 1. 原生：
+
+ 	Chromr dev tools 〉Source 〉右下角绑定监听 dom event, 比如 click, 然后点
+击这么element, 就会跳到相应的 js 代码
+
+ 2. jquery：
+
+ 	 	$("a#id-258").data("events")['click']

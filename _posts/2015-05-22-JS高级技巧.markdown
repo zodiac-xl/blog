@@ -1,0 +1,295 @@
+---
+layout: post
+title:  "css规范"
+date:   2015-05-22 18:32:25
+categories: 文档
+tags: js
+---
+<!--more-->
+
+###惰性载入函数
+提高性能方法原理：函数重新注册和自调用函数声明变量的方式定义函数2种方法
+
+	多数javascript包含大量if语句每次调用都判断的话 浪费性能 可使用惰性载入提高性能
+
+####方法一：根据if条件直接将函数重新注册 这样if语句就只会第一次调用时判断了
+    function createXHR() {
+        if ( window.XMLHttpRequest != "undefined" ) {
+            createXHR = function () {
+                return new XMLHttpRequest();
+            }
+        }
+        else if ( window.ActiveXObject != "undefined" ) {
+            createXHR = function () {
+
+                //高到低尝试创建IE ActiveXObject
+                if ( typeof  arguments.callee.activeXString != "string" ) {
+                    var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0", "MSXML2.XMLHttp"],
+                            i, len;
+                    for ( i = 0, len = versions.length; i++; i < len ) {
+                        try {
+                            new ActiveXObject( versions[i] );
+                            arguments.callee.activeXString = versions[i];
+                            break;
+                        }
+                        catch ( ex ) {
+                            //跳过
+                        }
+                    }
+                }
+                return new ActiveXObject( (arguments.callee.activeXString) );
+            };
+        }else{
+            createXHR = function () {
+                throw new Error( "No XHR Object available" );
+            }
+        }
+    }
+
+####方法2：自调用函数声明变量的方式定义函数
+>根据if条件return函数 因为变量会被保存在内纯中 所以也只会在代码呗加载的时候判断一次  之后都会使用return保存的变量
+
+    var createXHR = (function () {
+        if ( window.XMLHttpRequest != "undefined" ) {
+            return function () {
+                return new XMLHttpRequest();
+            };
+        }
+        else if ( window.ActiveXObject != "undefined" ) {
+            return function () {
+                if ( typeof  arguments.callee.activeXString != "string" ) {
+                    var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0", "MSXML2.XMLHttp"],
+                            i, len;
+                    for ( i = 0, len = versions.length; i++; i < len ) {
+                        try {
+                            new ActiveXObject( versions[i] );
+                            arguments.callee.activeXString = versions[i];
+                            break;
+                        }
+                        catch ( ex ) {
+                            //跳过
+                        }
+                    }
+                }
+                return new ActiveXObject( (arguments.callee.activeXString) );
+            };
+
+        }
+        else {
+            return function () {
+                throw new Error( "No XHR Object available" );
+            }
+        }
+    })();
+
+
+
+
+###函数绑定
+创建一个函数，可以在特定的this环境中以指定参数调用另一个函数。该技巧常常和回调事件与事件处理器一起使用，以便将函数作为变量传递的同时保留代码执行环境
+
+
+####问题场景：
+
+	var handler = {
+                message : "Event handled",
+                handleClick : function ( event ) {
+                    alert( this.message );
+                }
+            },
+            body = document.querySelector( "body" );
+    body.onclick = handler.handleClick;
+
+> alert了一个undefined 原因在于handleClick的执行环境没有被保存 应该指向handler对象的this实例指向了body对象
+>
+> 等同于body.onclick=function(){alert( this.message );}  this永远指向调用该表达式的对象
+>
+
+####解决方法 使用闭包保存环境  使用call apply在该环境下调用方法
+
+ 	function bind( fn, context ) {
+            return function () {
+                return fn.apply( context, arguments );
+            }
+    }
+
+    W.addHandler( body, "click", bind( handler.handleClick, handler ) );
+
+
+> bind()函数接受一个函数和一个环境 用来返回一个在给定环境中调用给定函数的函数，并且将参数原封不动传递
+>
+>bind函数在内部闭包 使用context的环境调用方法
+>
+> IE9+ chrome等开始支持原生bind 用法：handler.handleClick.bind(handler);
+
+
+
+###函数柯里化(function curry)
+函数柯里化基本方法和函数绑定一样：使用闭包返回一个函数。区别在于，在函数被调用时，返回的函数还需要设置一些传入的参数
+
+
+
+
+
+    function curry( fn ) {
+        var args = Array.prototype.slice.call( arguments, 1 );
+        return function () {
+            var innerArgs = Array.prototype.slice.call( arguments ),
+                    finalArgs = args.concat( innerArgs );
+            return fn.apply( null, finalArgs );
+        }
+    }
+
+    function add( num1, num2 ) {
+        return num1 + num2;
+    }
+
+    //参数可以多次传递 以为最终都会合并成一个数组嘛
+    var curriedAdd1 = curry( add, 5 );
+    alert( curriedAdd1( 3 ) );  //8
+    var curriedAdd2 = curry( add, 5, 3 );
+    alert( curriedAdd2() );//8
+
+
+>curry()函数主要工作是将被返回函数的参数进行排序。
+先用调用slice方法传入参数1 表示被返回的数组包含从第二个参数开始的所有参数
+在内部函数(即外部函数的第一个参数函数)中再用innerArgs数组存放所有传入的参数 最后将外部函数和内部函数的参数合并为finalArgs 以达到保存环境的作用
+
+
+####函数绑定和柯里化一起使用
+
+    function bindCurry( fn, context ) {
+        var args = Array.prototype.slice.call( arguments, 2 );
+        return function () {
+            var innerArgs = Array.prototype.slice.call( arguments ),
+                    finalArgs = args.concat( innerArgs );
+            return fn.apply( context, finalArgs );
+        }
+    }
+
+    var handler1 = {
+        message : "Event handled",
+        handleClick : function ( name, event ) {
+            //alert( name + " : " + event.type );
+        }
+    };
+    W.addHandler( body, "click", bindCurry( handler1.handleClick, handler1, "my-click" ) );
+
+
+
+
+###防篡改对象
+
+
+
+
+####防篡改级别一:不可扩展的对象Object.preventExtensions()
+
+>Object.preventExtensions()可以阻止向对象添加扩展  查看是否可扩展Object.isExtensible()
+
+>默认情况下任何对象都是可自由扩展的 任何时候都可以向对象添加属性和方法
+
+	var ob1 = {name : "zodiac"};
+       ob1.age = 22;
+       alert(ob1.age);//22
+
+       Object.preventExtensions( ob1 );
+       ob1.carrer = "font-end";
+       alert(ob1.carrer);//undefined
+       alert(Object.isExtensible(ob1));//false
+
+
+####防篡改级别二:密封的对象Object.seal()
+
+>设置Object.seal()后对象不仅不能扩展 已有成员的configurable（可配置的）也被设为false变为不可配置 不能删除改对象和它的属性和方法 也不能增加新的方法或属性 但可以修改
+
+>Object.isSealed查看是否被密封
+
+       var ob2 = {name : "zodiac"};
+       Object.seal( ob2 );
+       ob2.name = "xl";
+       delete ob2.name;
+       alert(ob1.name);//xl
+       alert(Object.isExtensible(ob1));//false
+       alert(Object.isSealed(ob2));//true
+
+
+####防篡改最高级别三:冻结的对象 Object.freeze()
+
+>Object.isFrozen() 对Javascript库的作者而言 冻结对象可以保证库的和性对象不被修改
+
+>即不可扩展 又是密封的 而且对象数据属性的[[Writable]]特性会被设置为false，如果定义了[[set]]函数，访问器的属性仍然可写
+
+    var ob3 = {name : "zodiac"};
+    Object.freeze( ob2 );
+    ob3.name = "xl";
+    delete ob2.name;
+    alert(ob1.name);//zodiac
+    alert(Object.isExtensible(ob1));//false
+    alert(Object.isSealed(ob2));//true
+    alert(Object.isFrozen(ob2));//true
+
+>备注：手动修改对象的configurable（可配置的）或 [[Writable]] 属性是无效的
+
+###高级计时器
+
+javascript是单线程的 计时器仅仅只是计划代码在未来每个时间进行。执行时机不能保证 实际上浏览器负责进行排序，指派某段代码在某个时间点运行的优先级
+
+定时器对队列的工作方式是：在特定的时间后将代码插入。但并不意味着插入的代码会立刻执行。只是会排入队列尽快执行。
+
+####Yielding Processes生产过程
+运行在浏览器的JavaScript被分配了一定数量的资源，被严格限制了内存大小和处理器时间 以防恶意web程序员搞挂计算机，如果代码运行时间超过特定时间或超过特定语句数量就会弹出错误
+
+解决方法：使用定时器分割处理长时间的循环等造成脚本运行时间较长的代码段
+
+    function chunk( array, process, context ) {
+
+
+        setTimeout( function () {
+            var item = array.shift();
+            process.call( context, item );
+
+            if ( array.length > 0 ) {
+                setTimeout( arguments.callee, 100 );
+            }
+        }, 100 )
+    }
+
+    var data = [21, 1213, 31, 31, 31];
+
+    function printValue( item ) {
+        document.querySelector( "body" ).innerHTML += item;
+    }
+
+    chunk( data, printValue );
+
+>chunk函数将连续的代码分块较小间隔执行；
+> array要处理的项目的数组，process处理项目的函数，context函数运行的环境当函数处于全局作用域时刻省略；直接传递数组，数组中的条目也会被改变，如果向保持原数组不变，可以传递该数组的克隆个函数data.concat()。
+
+
+
+
+####函数节流 避免高频率触发 造成浏览器崩溃 只要代码是周期执行的都应该使用节流
+
+
+>浏览器的某些计算和处理要比其他昂贵很多。
+ 如：DOM操作比非DOM交互需要更多的CPU和内存。连续尝试过多的DOM操作可能使浏览器挂起或崩溃。
+ 在IE中使用onresize处理事件时，当浏览器大小调整时会连续触发，可能导致浏览器崩溃，这类情况就可以使用定时器对该函数节流。
+
+    function throttle( method, context ) {
+        clearTimeout( method.tId );
+        method.tId = setTimeout( function () {
+            method.call( context );
+        }, 100 )
+    }
+
+    function resize() {
+        document.querySelector( "body" ).innerHTML += "<br/>--------" + document.querySelector( "body" ).offsetWidth;
+    }
+
+    W.addHandler( window, "resize", function () {
+        throttle( resize );
+    } );
+
+
+

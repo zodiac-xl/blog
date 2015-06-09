@@ -185,9 +185,8 @@ blockquote {
 pre,
 code {
     font-size: 15px;
-    border: 1px solid $grey-color-light;
     border-radius: 3px;
-    background-color: #eef;
+
 }
 
 code, tt {
@@ -195,45 +194,27 @@ code, tt {
     padding: 0 5px;
     white-space: nowrap;
     border: 1px solid #eaeaea;
-    background-color: #f8f8f8;
     border-radius: 3px; }
 
-pre code {
-    margin: 0;
-    padding: 0;
-    white-space: pre;
-    border: none;
-    background: transparent; }
 
-.highlight pre {
-    background-color: #f8f8f8;
-    border: 1px solid #cccccc;
-    font-size: 13px;
-    line-height: 19px;
-    overflow: auto;
-    padding: 6px 10px;
-    border-radius: 3px; }
 
 pre {
-    background-color: #f8f8f8;
-    border: 1px solid #cccccc;
     font-size: 13px;
     line-height: 19px;
-    overflow: auto;
-    padding: 6px 10px;
-    border-radius: 3px; }
-pre code, pre tt {
-    background-color: transparent;
-    border: none; }
-pre {
+    border-radius: 3px;
     padding: 8px 12px;
     overflow-x: auto;
+    background: url(/blog/lib/img/blueprint-dark.png) top center #fafbfc;
+    border-left: 6px solid #558abb;
 
     > code {
+        margin: 0;
+        padding: 0;
+        white-space: pre;
+        border: none;
         color: inherit;
         border: 0;
-        padding-right: 0;
-        padding-left: 0;
+        background: transparent;
     }
 }
 

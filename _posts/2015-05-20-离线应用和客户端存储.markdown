@@ -1,0 +1,197 @@
+---
+layout: post
+title:  "离线应用和客户端存储"
+date:   2015-05-20 17:17:42
+categories: 文档
+tags: js
+---
+<!--more-->
+
+
+###离线检测
+
+判断设备是否能上网 navigator.onLine
+
+window事件online offline 在网络环境发生变化时触发
+
+    alert( navigator.onLine );
+
+    W.addHandler( window, "online", function () {
+        alert( "online" );
+    } );
+    W.addHandler( window, "offline", function () {
+        alert( "offline" );
+    } );
+
+
+###应用程序缓存（Application Cache）
+HTML5 引入了应用程序缓存，这意味着 web 应用可进行缓存，并可在没有因特网连接时进行访问
+
+应用程序缓存为应用带来三个优势：
+
+* 离线浏览 - 用户可在应用离线时使用它们
+* 速度 - 已缓存资源加载得更快
+* 减少服务器负载 - 浏览器将只从服务器下载更新过或更改过的资源。
+
+
+		<html manifest="demo.appcache">
+
+>指定manifest文件
+>
+>manifest 文件的建议的文件扩展名是：".appcache"。
+>manifest 文件需要配置正确的 MIME-type，即 "text/cache-manifest"。必须在 web 服务器上进行配置。
+
+
+manifest 文件可分为三个部分：
+
+* CACHE MANIFEST - 在此标题下列出的文件将在首次下载后进行缓存
+* NETWORK - 在此标题下列出的文件需要与服务器的连接，且不会被缓存
+* FALLBACK - 在此标题下列出的文件规定当页面无法访问时的回退页面（比如 404 页面)
+
+更新缓存
+一旦应用被缓存，它就会保持缓存直到发生下列情况：
+
+1. 用户清空浏览器缓存
+2. manifest 文件被修改
+3. 由程序来更新应用缓存
+
+实例 - 完整的 Manifest 文件
+
+	CACHE MANIFEST
+	# 2012-02-21 v1.0.0
+	/theme.css
+	/logo.gif
+	/main.js
+
+	NETWORK:
+	login.asp
+
+	FALLBACK:
+	/html5/ /404.html
+
+>以 "#" 开头的是注释行，但也可满足其他用途。应用的缓存会在其 manifest 文件更改时被更新。如果您编辑了一幅图片，或者修改了一个 JavaScript 函数，这些改变都不会被重新缓存。更新注释行中的日期和版本号是一种使浏览器重新缓存文件的办法
+
+
+
+
+
+
+###数据存储
+
+####HTTP cookie
+该标准要求服务器对任意HTTP请求发送Set-Cookie HTTP头作为相应的一部分，其中包括会话信息
+
+1. 限制
+
+	* cookie在性质上是绑定在特定的域名下的。
+	* 当设定了一个cookie后，再给创建它的域名发送请求时，request header会包含所有cookie。
+	* 这个限制确保了存储在cookie中的信息只能让批准的接受者访问，而无法被其他域访问
+	* cookie在客户端计算机大小和数量都有限制 根据浏览器不同单个域下最多20-50个 整个cookie长度限制在2095b
+
+2. cookie的构成  只有名值对儿才会被发送到服务器 其他参数都是服务器给浏览器的指示
+
+	* 名称name  需要经过URL编码
+	* 值value
+	* 域domain
+	* 路径path
+	* 失效时间expires
+	* 安全标志secure
+
+	>设置了secure标志的cookie只能通过SSL加密连接才能传输
+
+3. 在请求头中设置cookie
+
+		Content-type:text/html
+	    Set-Cookie:name-value;expires=Mon,22-Jan-07 07:10:24 GMT;domain=.wrox.com;path=/;secure
+	    Other-header:other-header-value
+		xhr.setRequestHeader( key, value )
+
+
+
+
+
+ 4. JavaScript中的cookie
+
+ 			//返回所有cookie字符串 ;分割
+ 			consile.log(document.cookie);//"a=b;c=d"
+
+ 			//并不会覆盖原来的cookie 除非名称已经存在
+ 			document.cookie="key=value";
+
+
+5. 子cookie
+
+	为了绕开浏览器对单域名下的cookie的限制，使用子cookie
+
+		key=subKey1=subValue1&subKey2=subValue2;
+
+	>基本原理是在value中包含子cookie
+
+
+	>虽然扰过了cookie数量限制却增加了cookie的长度
+
+
+####Web存储机制
+
+#####Storage类型
+HTML5 Storage类型都有公共方法setItem getItem removeItem  key的大小限制根据浏览器2.5M--5M
+
+1. sessionStorage保持到会话结束，即保存到浏览器关闭 合适会话类的小段数据
+
+	    //使用方法存储数据
+	    sessionStorage.setItem( "name", "zodiac" );
+
+	    //使用属性存储数据
+	    sessionStorage.age = "22";
+
+	    //使用方法获取数据
+	    var name = sessionStorage.getItem( "name" );
+
+	    //使用属性获取数据
+	    var age = sessionStorage.age;
+
+	    //删除值 使用delete删除一个值 在Webkit中无效
+	    sessionStorage.removeItem("name");
+	    delete sessionStorage.age
+
+	    //逆序获取指定位置上的名字
+	    W.log( sessionStorage.key( 0 ) );
+
+
+2. localStorage HTML5标准 老版本使用globalStorage 跨会话第存储数据，但有特定的访问限制
+
+     * globalStorage需要指定那些域可以访问该数据
+     * 要访问localStorage,页面必须来自同一域名(子域名无效),同一协议，同一端口上。相当于globalStorage[location.host]
+     * 两者的数据都保存到通过JavaScript删除或者用户清除浏览器缓存为止
+
+>方法：和sessionStorage类似
+>
+>事件：storage 为Storage对象进行任何修改，都会在文档上触发storage事件 set get remove delete等都会触发
+
+ 兼容方法：
+
+	    function getLocalStorage() {
+	        if ( typeof localStorage == "object" ) {
+	            return localStorage;
+	        }
+	        else if ( typeof globalStorage == "object" ) {
+	            return globalStorage[location.host];
+	        }
+	        else {
+	            throw new Error( "Local Storage not available" );
+	        }
+	    }
+    	var localStorage = getLocalStorage();
+
+
+
+#####IndexedDB
+
+IndexedDB 是一个为了能够在客户端存储可观数量的结构化数据，并且在这些数据上使用索引进行高性能检索的 API。
+
+>虽然 DOM 存储 对于存储少量数据是非常有用的，但是它对大量结构化数据的存储就显得力不从心了。IndexedDB 则提供了这样的一个解决方案。
+
+>
+>IndexedDB 分别为同步和异步访问提供了单独的 API 。同步 API 本来是要用于仅供 Web Workers 内部使用，但是还没有被任何浏览器所实现。异步 API 在 Web Workers 内部和外部都可以使用。
+
+

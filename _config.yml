@@ -64,3 +64,8 @@ owner:
 
 #分类前缀设置
 category_title_prefix: ""
+
+
+redcarpet:
+  extensions: [fenced_code_blocks]
+  render_options:

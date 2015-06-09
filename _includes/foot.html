@@ -1,0 +1,73 @@
+<script>
+    $(function () {
+        var hData = [];
+        var h3Index,
+                h4Index,
+                h5Index,
+                h3Tree,
+                h4Tree,
+                h5Tree;
+
+        h3Index = h4Index = h5Index = 0;
+        h3Tree = h4Tree = h5Tree = hData;
+
+
+        $("h3,h4,h5").each(function (i, el) {
+            var id,
+                    parentTree = hData;
+
+            switch (this.tagName) {
+                case "H3":
+                    id = "h3-" + String(h3Index++);
+                    parentTree = h3Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    h4Tree = h3Tree[h3Tree.length - 1].subTree;
+                    break;
+                case "H4":
+                    id = "h3-" + String(h3Index) + "_h4-" + String(h4Index++);
+                    parentTree = h4Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    h5Tree = h4Tree[h4Tree.length - 1].subTree;
+                    break;
+                case "H5":
+                    id = "h3-" + String(h3Index) + "_h4-" + String(h4Index) + "_h5-" + String(h5Index++);
+                    parentTree = h5Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    break;
+                default :
+                    break;
+            }
+
+            el.id = id;
+
+        });
+
+
+        function createUl(data, parent) {
+            var $ul = $("<ul></ul>");
+            $.each(data, function (index, item) {
+                var $li = $("<li><a href='#" + item.id + "'>" + item.name + "</a></li>");
+
+                if (item.subTree && item.subTree.length != 0) {
+                    createUl(item.subTree, $li);
+                }
+                $ul.append($li);
+            });
+            parent.append($ul);
+        }
+
+        createUl(hData, $("#toc"));
+    });
+</script>

@@ -87,7 +87,8 @@ URL.createObjectURL的参数是File对象或者Blob对象，File对象也就是�
     $( "input[type='file']" ).bind( "change", function () {
         var reader = new FileReader(), htmlImage;
         reader.onload = function ( e ) {
-            htmlImage = '<img src="' + e.target.result + '" />';               			  $( "body" ).append( htmlImage );
+            htmlImage = '<img src="' + e.target.result + '" />';
+            $( "body" ).append( htmlImage );
             downloadFile("新文件名",e.target.result)
         };
         reader.readAsDataURL( $( this ).get( 0 ).files[0] );
@@ -96,4 +97,7 @@ URL.createObjectURL的参数是File对象或者Blob对象，File对象也就是�
 现在，只要一调用downloadFile，文件就自动下载
 
 占坑：下载的文件是base64数据  如果怎样才能还原成可以打开的文件呢？
+
+
+
 

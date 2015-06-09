@@ -1,0 +1,51 @@
+---
+layout: post
+title:  "创建和触发event"
+date:   2015-05-17 18:54:33
+categories: 文档
+tags: js
+---
+<!--more-->
+
+###自定义事件 （Custom events)
+
+	var event = new Event('build');
+
+	// Listen for the event.
+	elem.addEventListener('build', function (e) { ... }, false);
+
+	// Dispatch the event.
+	elem.dispatchEvent(event);
+
+>绝大多数当代浏览器中都会支持这个构造函数（Internet Explorer 例外
+
+
+###添加自定义数据 – CustomEvent
+CustomEvent 接口可以为 event 对象添加更多的数据。例如，event 可以创建如下：
+
+	var event = new CustomEvent('build', { 'detail': "time"});
+
+
+>上面的代码允许在事件帧听器中访问更多的数据：
+
+	function eventHandler(e) {
+	  log('The time is: ' + e.detail);
+	}
+
+
+###过时的方法
+这种过时的使用API创建事件的方法是来自 Java的灵感。实例代码如下所示：
+
+	// Create the event.
+	var event = document.createEvent('Event');
+
+	// Define that the event name is 'build'.
+	event.initEvent('build', true, true);
+
+	// Listen for the event.
+	document.addEventListener('build', function (e) {
+		 // e.target matches document from above
+	}, false);
+
+	// target can be any Element or other EventTarget.
+	document.dispatchEvent(event);

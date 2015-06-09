@@ -1,0 +1,13 @@
+---
+layout: post
+title:  "chrome调试总结"
+date:   2015-04-25 14:23:45
+categories: 文档
+tags: 调试
+---
+<!--more-->
+
+
+
+
+![MacDown logo]({{ '/lib/img/xr.png' | prepend: site.baseurl }})
