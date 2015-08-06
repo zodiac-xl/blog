@@ -6,9 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Page-Exit" Content="revealTrans(duration=3, transition=23)">
-    <title>About</title>
+    <title>meta标签详解</title>
     <meta name="description"
-          content="we are young we are strong">
+          content="">
 
     <link rel="stylesheet" href="http://yandex.st/highlightjs/7.1/styles/default.min.css">
 
@@ -18,7 +18,7 @@
     <script>hljs.initHighlightingOnLoad();</script>
 
     <link rel="stylesheet" href="/blog/css/main.css">
-    <link rel="canonical" href="http://zodiac-xl.github.io/blog/about/">
+    <link rel="canonical" href="http://zodiac-xl.github.io/blog/%E6%96%87%E6%A1%A3/2015/05/04/meta%E6%A0%87%E7%AD%BE%E8%AF%A6%E8%A7%A3.html">
     <link rel="alternate" type="application/rss+xml" title="zodiac's blog"
           href="http://zodiac-xl.github.io/blog/rss.xml"/>
     <link href="http://zodiac-xl.github.io/blog/rss.xml" type="application/atom+xml"
@@ -137,17 +137,169 @@
     <div class="wrapper">
         <div class="post">
 
-    <header class="post-header">
-        <h1 class="post-title">About</h1>
-    </header>
-    <article class="post-content">
-        <p>This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at <a href="http://jekyllrb.com/">jekyllrb.com</a></p>
+  <header class="post-header">
+    <h1 class="post-title">meta标签详解</h1>
+    <p class="post-meta">May 4, 2015</p>
+  </header>
+  <div class="column-strip wiki-column" id="wiki-right">
+    <!-- table of contents -->
+    <div id="toc" class="toc toggleable">
+      <a href="#toc" class="title toggler" data-open-icon="icon-plus" data-closed-icon="icon-minus" aria-haspopup="true">在本文章中<i class="icon-minus"></i></a>
+    </div>
+  </div>
+  <article class="post-content">
+    <!--more-->
 
-<p>You can find the source code for the Jekyll new theme at: <a href="https://github.com/jglovier/jekyll-new">github.com/jglovier/jekyll-new</a></p>
 
-<p>You can find the source code for Jekyll at <a href="https://github.com/jekyll/jekyll">github.com/jekyll/jekyll</a></p>
+<h3>一、定义语言</h3>
 
-    </article>
+<pre><code> &lt;meta charset="utf-8"/&gt;
+</code></pre>
+
+<p>规定 HTML 文档的字符编码 ；常用的有UTF8是国际编码 GBK是中文编码等；
+如果网页出现乱码，可以检查网页输出编码、网页文件保存编码、数据库整理编码是否一致</p>
+
+<h3>二、name属性</h3>
+
+<p>name属性主要用于描述网页，与之对应的属性值为content，content中的内容主要是便于搜索引擎机器人查找信息和分类信息用的。</p>
+
+<p>meta标签的name属性语法格式是：</p>
+
+<pre><code>&lt;meta name="参数" content="具体的参数值"&gt;
+</code></pre>
+
+<p>name属性主要参数：</p>
+
+<ol>
+<li><p>Keywords 告诉搜索引擎你网页的关键字是什么</p>
+
+<pre><code> &lt;meta name ="keywords" content="science,education,culture,politics,ecnomics,relationships,entertainment,human"&gt;
+</code></pre></li>
+<li><p>description 告诉搜索引擎你的网站主要内容</p>
+
+<pre><code> &lt;meta name="description" content="This page is about the meaning of science,education,culture."&gt;
+</code></pre></li>
+<li><p>robots 机器人向导告诉搜索机器人哪些页面需要索引，哪些页面不需要索引 content的参数有all,none,index,noindex,follow,nofollow。默认是all。</p>
+
+<pre><code> &lt;meta name="robots" content="none"&gt;
+</code></pre></li>
+<li><p>all：文件将被检索，且页面上的链接可以被查询；</p></li>
+<li><p>none：文件将不被检索，且页面上的链接不可以被查询；</p></li>
+<li><p>index：文件将被检索；（让robot/spider登录）</p></li>
+<li><p>follow：页面上的链接可以被查询；</p></li>
+<li><p>noindex：文件将不被检索，但页面上的链接可以被查询；(不让robot/spider登录)</p></li>
+<li><p>nofollow：文件将不被检索，页面上的链接可以被查询。(不让robot/spider顺着此页的连接往下探找)</p></li>
+<li><p>author标注网页的作者</p></li>
+<li>Copyright (版权)</li>
+<li><p>revisit-after(重访)</p>
+
+<pre><code> &lt;META name="revisit-after" CONTENT="7 days" &gt;
+</code></pre></li>
+</ol>
+
+
+<h3>三、http-equiv属性</h3>
+
+<p>http-equiv顾名思义，相当于http的文件头作用，它可以向浏览器传回一些有用的信息，以帮助正确和精确地显示网页内容，与之对应的属性值为content，content中的内容其实就是各个参数的变量值。</p>
+
+<p>meta标签的http-equiv属性语法格式是：</p>
+
+<pre><code>    &lt;meta http-equiv="参数" content="参数变量值"&gt;
+</code></pre>
+
+<p>http-equiv属性主要参数：</p>
+
+<ol>
+<li><p>Expires 设定网页的到期时间。一旦网页过期，必须重新请求服务器。（时间必须使用<strong><em>GMT时间格式</em></strong>）</p>
+
+<pre><code> &lt;meta http-equiv="expires" content="Fri,12 Jan 2001 18:18:18 GMT"&gt;
+</code></pre></li>
+<li><p>Pragma(cache模式）浏览器默认缓存页面 设置后禁止浏览器从本地计算机的缓存中访问页面内容（无法<strong><em>脱机浏览</em></strong>）</p>
+
+<pre><code> &lt;meta http-equiv="Pragma" content="no-cache"&gt;
+</code></pre></li>
+<li><p>Refresh 自动刷新并转到新页面 停留content秒钟后自动刷新到URL网址 URL可为空</p>
+
+<pre><code> &lt;meta http-equiv="Refresh" content="2;URL"&gt;
+</code></pre></li>
+<li><p>Set-Cookie(cookie设定）一般存放小数据 如果网页过期，那么存盘的cookie将被删除（时间必须使用<strong><em>GMT时间格式</em></strong>）</p>
+
+<pre><code> &lt;meta http-equiv="Set-Cookie" content="cookievalue=xxx; expires=Friday,12-Jan-2001 18:18:18 GMT; path=/"&gt;
+</code></pre></li>
+<li><p>Window-target 显示窗口的设定 这个属性是用来防止别人在框架里调用你的页面。Content选项：<em>blank、</em>top、<em>self、</em>parent。</p>
+
+<pre><code> &lt;Meta http-equiv=Widow-target Content=_top&gt;
+</code></pre></li>
+</ol>
+
+
+<h3>四、动画效果（IE）</h3>
+
+<p>使用meta标签，我们还可以在进入网页或者离开网页的一刹那实现动画效果 （所加网页不能是一个Frame页）</p>
+
+<pre><code>    &lt;meta http-equiv="Page-Enter" content="revealTrans(duration=5.0,transition=20)"&gt;
+</code></pre>
+
+<p>Duration表示滤镜特效的持续时间（单位：秒）</p>
+
+<p>Transition滤镜类型。表示使用哪种特效，取值为0-23:</p>
+
+<ul>
+<li><p>Page-Enter : 进入页面</p></li>
+<li><p>Page-Exit  : 离开页面</p></li>
+<li><p>Site-Enter : 进入网站</p></li>
+<li><p>Site-Exit  : 离开网站</p></li>
+<li><p>0矩形缩小</p></li>
+<li>1矩形扩大</li>
+<li>2 圆形缩小</li>
+<li>3 圆形扩大</li>
+<li>4 下到上刷新</li>
+<li>5 上到下刷新</li>
+<li>6 左到右刷新</li>
+<li>7 右到左刷新</li>
+<li>8 竖百叶窗</li>
+<li>9 横百叶窗</li>
+<li>10 错位横百叶窗</li>
+<li>11 错位竖百叶窗</li>
+<li>12 点扩散</li>
+<li>13 左右到中间刷新</li>
+<li>14 中间到左右刷新</li>
+<li>15 中间到上下</li>
+<li>16 上下到中间</li>
+<li>17 右下到左上</li>
+<li>18 右上到左下</li>
+<li>19 左上到右下</li>
+<li>20 左下到右上</li>
+<li>21 横条</li>
+<li>22 竖条</li>
+<li>23 以上22种随机选择一种</li>
+</ul>
+
+
+<h3>五、其他用法</h3>
+
+<ol>
+<li><p>Link (链接) 很多网站如果你把她保存在收件夹中后，会发现它连带着一个小图标，如果再次点击进入之后还会发现地址栏中也有个小图标。现在只要在你的页头加上这段话，就能轻松实现这一功能。</p>
+
+<pre><code> &lt;Link href="soim.ico" rel="Shortcut Icon"&gt;
+</code></pre></li>
+<li><p>Base (基链接) 插入网页基链接属性
+网页上的所有相对路径在链接时都将在前面加上“http://www.***.com/”。其中target=<em>blank是链接文件在新 的窗口中打开，你可以做其他设置。将“</em>blank”改为“<em>parent”是链接文件将在当前窗口的父级窗口中打开；改为“</em>self”链接文件在当前 窗口（帧）中打开；改为“_top”链接文件全屏显示</p>
+
+<pre><code>  &lt;Base href=http://www.***.net/ target=_blank&gt;
+</code></pre></li>
+</ol>
+
+
+  </article>
+  <nav>
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/03/%E5%B8%B8%E7%94%A8CSS%E4%BC%98%E5%8C%96%E6%80%BB%E7%BB%93%E2%80%94%E2%80%94%E7%BD%91%E7%BB%9C%E6%80%A7%E8%83%BD%E4%B8%8E%E8%AF%AD%E6%B3%95%E6%80%A7%E8%83%BD%E5%BB%BA%E8%AE%AE.html" title="常用CSS优化总结——网络性能与语法性能建议">&larr; Previous Post</a>
+    
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/07/javaScript%E7%BB%A7%E6%89%BF.html" title="javaScript继承">Next Post &rarr;</a>
+    
+  </nav>
 
 </div>
 

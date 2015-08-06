@@ -6,9 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Page-Exit" Content="revealTrans(duration=3, transition=23)">
-    <title>About</title>
+    <title>常用CSS优化总结——网络性能与语法性能建议</title>
     <meta name="description"
-          content="we are young we are strong">
+          content="">
 
     <link rel="stylesheet" href="http://yandex.st/highlightjs/7.1/styles/default.min.css">
 
@@ -18,7 +18,7 @@
     <script>hljs.initHighlightingOnLoad();</script>
 
     <link rel="stylesheet" href="/blog/css/main.css">
-    <link rel="canonical" href="http://zodiac-xl.github.io/blog/about/">
+    <link rel="canonical" href="http://zodiac-xl.github.io/blog/%E6%96%87%E6%A1%A3/2015/05/03/%E5%B8%B8%E7%94%A8CSS%E4%BC%98%E5%8C%96%E6%80%BB%E7%BB%93%E2%80%94%E2%80%94%E7%BD%91%E7%BB%9C%E6%80%A7%E8%83%BD%E4%B8%8E%E8%AF%AD%E6%B3%95%E6%80%A7%E8%83%BD%E5%BB%BA%E8%AE%AE.html">
     <link rel="alternate" type="application/rss+xml" title="zodiac's blog"
           href="http://zodiac-xl.github.io/blog/rss.xml"/>
     <link href="http://zodiac-xl.github.io/blog/rss.xml" type="application/atom+xml"
@@ -137,17 +137,107 @@
     <div class="wrapper">
         <div class="post">
 
-    <header class="post-header">
-        <h1 class="post-title">About</h1>
-    </header>
-    <article class="post-content">
-        <p>This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at <a href="http://jekyllrb.com/">jekyllrb.com</a></p>
+  <header class="post-header">
+    <h1 class="post-title">常用CSS优化总结——网络性能与语法性能建议</h1>
+    <p class="post-meta">May 3, 2015</p>
+  </header>
+  <div class="column-strip wiki-column" id="wiki-right">
+    <!-- table of contents -->
+    <div id="toc" class="toc toggleable">
+      <a href="#toc" class="title toggler" data-open-icon="icon-plus" data-closed-icon="icon-minus" aria-haspopup="true">在本文章中<i class="icon-minus"></i></a>
+    </div>
+  </div>
+  <article class="post-content">
+    <!--more-->
 
-<p>You can find the source code for the Jekyll new theme at: <a href="https://github.com/jglovier/jekyll-new">github.com/jglovier/jekyll-new</a></p>
 
-<p>You can find the source code for Jekyll at <a href="https://github.com/jekyll/jekyll">github.com/jekyll/jekyll</a></p>
+<p>关于CSS的优化工作主要从两个方面着手</p>
 
-    </article>
+<ol>
+<li>网络性能：把CSS写到字节数最少，加快下载速度  合并压缩css文件等</li>
+<li>语法性能：优化语法  合并css语句</li>
+</ol>
+
+
+<h3>一、CSS压缩</h3>
+
+<p>就是把我们CSS中没用的空白符等删去，达到缩减字符个数的目的</p>
+
+<pre><code>.test{
+    background-color:#ffffff;
+    background-image:url(a.jpg);
+}
+</code></pre>
+
+<p>经过压缩后会变成这样：</p>
+
+<pre><code>.test{ background-color:#fff;  background-image:url(a.jpg)}
+</code></pre>
+
+<h3>二、gzip压缩</h3>
+
+<p>在没有gzip压缩的情况下，Web服务器直接把html页面、CSS脚本、js脚本发送给浏览器，
+而支持gzip的Web服务器将把文件压缩后再发给浏览器，浏览器（支持gzip）在本地进行解压和解码，并显示原文件。
+这样大约可以减少70％以上的文件大小，达到网络性能优化的目的。
+gzip压缩需要服务器的支持，所以我们需要在服务器端进行配置。</p>
+
+<h3>三、合写CSS属性</h3>
+
+<p>合并font margin/padding background border transform animation等属性的单个属性</p>
+
+<h3>四、利用继承</h3>
+
+<p>CSS的继承机制也可以帮我们再一定程度上缩减字节数，我们知道CSS有很多属性是可以继承的即在父容器设置了默写属性，子容器会默认也使用这些属性，因此如果我们希望全文字体尺寸是14px，大可不必为每个容器设置，只需要在body上设置就可以了</p>
+
+<h3>五、模块化css 利用缓存</h3>
+
+<p>有的页面只会用一个Dialog、有的页面只用到了一个TreeView把css模块化按需加载 还可以单独缓存</p>
+
+<p>模块化后CSS的http请求会增加，为了减少http请求可以使用combo服务。</p>
+
+<h3>六、CSS放在head中，减少repaint和reflow</h3>
+
+<p>浏览器从上到下一边下载html生成DOM tree，一边根据浏览器默认及现有CSS生成render tree来渲染页面，当遇到新的CSS的时候下载并结合现有CSS重新生成render tree，刚才的渲染工作就白费了，如果我们把所有CSS都放到页面顶部，这样就没有重新渲染的过程了。</p>
+
+<ul>
+<li><p>reflow：当DOM元素出现隐藏／显示、尺寸变化、位置变化的时候都会让浏览器重新渲染页面，之前渲染工作白费了</p></li>
+<li><p>repaint：当元素的背景颜色、边框颜色变化虽然不会引起reflow的变化但是会让浏览器重新渲染该元素。所以我们应该在开始就定义好属性，不让浏览器重复渲染。</p></li>
+</ul>
+
+
+<h3>七、避免适用通配符或隐式通配符</h3>
+
+<p>body * {padding:0;margin:0;}
+这是对body的子结点都设置一些属性，但因为CSS继承特性的原因，页面所有元素都会接受这个规则，对于复杂的页面在性能上的影响还是很大的，这并不是说不能使用通配符，而是说使用的时候要注意范围。</p>
+
+<p>一些隐式的通配符
+:visible{
+  padding:0;
+}
+这样的几乎就和通配符一样，在使用的时候一定要注意范围限制问题</p>
+
+<h3>八、避免层级或过度限制的CSS</h3>
+
+<p><strong><em>CSS是从右到左解析的</em></strong></p>
+
+<p>不要用标签或 class 来限制 ID 规则
+这个应该是个常识，#test.info或者div#test这样的选择器是画蛇添足，id已经可以唯一而且最快的定位一个元素了</p>
+
+<p>不要用标签名限制 class 规则
+这个估计被误用的更多，如div.info这样的写法，其实我们可以直接写为.info，从右到左解析的原因可以知道为什么其低效，如果直接使用class不能达到目的，一般情况下应该是class设计的有问题，CSS需要重构了</p>
+
+<p>尽量使用最具体的类别、避免后代选择器、属于标签类别的规则永远不要包含子选择器
+这三条规则是想通的，因为从左到右解析关系，在CSS选择器中后代选择器非但没有帮我们加快CSS查找，反而后代选择器是 CSS 中耗费最昂贵的选择器。 它的耗费是极其昂贵的—特别是当选择器在标签或通用类别中，建议是当使用子选择器时要十分谨慎，能免则免。对此我们可以通过具体类别——使用单一或尽量少的class解决。</p>
+
+  </article>
+  <nav>
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/03/%E5%AE%B9%E6%98%93%E8%A2%AB%E5%BF%BD%E7%95%A5%E7%9A%84css%E7%89%B9%E6%80%A7.html" title="容易被忽略的css特性">&larr; Previous Post</a>
+    
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/04/meta%E6%A0%87%E7%AD%BE%E8%AF%A6%E8%A7%A3.html" title="meta标签详解">Next Post &rarr;</a>
+    
+  </nav>
 
 </div>
 

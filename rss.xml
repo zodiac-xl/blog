@@ -9,14 +9,1748 @@
     <link>http://zodiac-xl.github.io</link>
     <description>we are young we are strong</description>
     <copyright>Copyright@2015,Zodiac</copyright>
-    <pubDate>Sat, 25 Apr 2015 14:23:45 +0000</pubDate>
+    <pubDate>Fri, 22 May 2015 18:32:25 +0000</pubDate>
     <item>
-      <title>常用CSS优化总结——网络性能与语法性能建议</title>
-      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/04/25/%E5%B8%B8%E7%94%A8CSS%E4%BC%98%E5%8C%96%E6%80%BB%E7%BB%93%E2%80%94%E2%80%94%E7%BD%91%E7%BB%9C%E6%80%A7%E8%83%BD%E4%B8%8E%E8%AF%AD%E6%B3%95%E6%80%A7%E8%83%BD%E5%BB%BA%E8%AE%AE.html</link>
+      <title>css规范</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/22/JS%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7.html</link>
       <description><![CDATA[
 ]]></description>
-      <pubDate>Sat, 25 Apr 2015 14:23:45 +0000</pubDate>
-      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/04/25/%E5%B8%B8%E7%94%A8CSS%E4%BC%98%E5%8C%96%E6%80%BB%E7%BB%93%E2%80%94%E2%80%94%E7%BD%91%E7%BB%9C%E6%80%A7%E8%83%BD%E4%B8%8E%E8%AF%AD%E6%B3%95%E6%80%A7%E8%83%BD%E5%BB%BA%E8%AE%AE.html</guid>
+      <pubDate>Fri, 22 May 2015 18:32:25 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/22/JS%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<h3>惰性载入函数</h3>
+
+<p>提高性能方法原理：函数重新注册和自调用函数声明变量的方式定义函数2种方法</p>
+
+<pre><code>多数javascript包含大量if语句每次调用都判断的话 浪费性能 可使用惰性载入提高性能
+</code></pre>
+
+<h4>方法一：根据if条件直接将函数重新注册 这样if语句就只会第一次调用时判断了</h4>
+
+<pre><code>function createXHR() {
+    if ( window.XMLHttpRequest != "undefined" ) {
+        createXHR = function () {
+            return new XMLHttpRequest();
+        }
+    }
+    else if ( window.ActiveXObject != "undefined" ) {
+        createXHR = function () {
+
+            //高到低尝试创建IE ActiveXObject
+            if ( typeof  arguments.callee.activeXString != "string" ) {
+                var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0", "MSXML2.XMLHttp"],
+                        i, len;
+                for ( i = 0, len = versions.length; i++; i &lt; len ) {
+                    try {
+                        new ActiveXObject( versions[i] );
+                        arguments.callee.activeXString = versions[i];
+                        break;
+                    }
+                    catch ( ex ) {
+                        //跳过
+                    }
+                }
+            }
+            return new ActiveXObject( (arguments.callee.activeXString) );
+        };
+    }else{
+        createXHR = function () {
+            throw new Error( "No XHR Object available" );
+        }
+    }
+}
+</code></pre>
+
+<h4>方法2：自调用函数声明变量的方式定义函数</h4>
+
+<blockquote><p>根据if条件return函数 因为变量会被保存在内纯中 所以也只会在代码呗加载的时候判断一次  之后都会使用return保存的变量</p></blockquote>
+
+<pre><code>var createXHR = (function () {
+    if ( window.XMLHttpRequest != "undefined" ) {
+        return function () {
+            return new XMLHttpRequest();
+        };
+    }
+    else if ( window.ActiveXObject != "undefined" ) {
+        return function () {
+            if ( typeof  arguments.callee.activeXString != "string" ) {
+                var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0", "MSXML2.XMLHttp"],
+                        i, len;
+                for ( i = 0, len = versions.length; i++; i &lt; len ) {
+                    try {
+                        new ActiveXObject( versions[i] );
+                        arguments.callee.activeXString = versions[i];
+                        break;
+                    }
+                    catch ( ex ) {
+                        //跳过
+                    }
+                }
+            }
+            return new ActiveXObject( (arguments.callee.activeXString) );
+        };
+
+    }
+    else {
+        return function () {
+            throw new Error( "No XHR Object available" );
+        }
+    }
+})();
+</code></pre>
+
+<h3>函数绑定</h3>
+
+<p>创建一个函数，可以在特定的this环境中以指定参数调用另一个函数。该技巧常常和回调事件与事件处理器一起使用，以便将函数作为变量传递的同时保留代码执行环境</p>
+
+<h4>问题场景：</h4>
+
+<pre><code>var handler = {
+            message : "Event handled",
+            handleClick : function ( event ) {
+                alert( this.message );
+            }
+        },
+        body = document.querySelector( "body" );
+body.onclick = handler.handleClick;
+</code></pre>
+
+<blockquote><p>alert了一个undefined 原因在于handleClick的执行环境没有被保存 应该指向handler对象的this实例指向了body对象</p>
+
+<p>等同于body.onclick=function(){alert( this.message );}  this永远指向调用该表达式的对象</p></blockquote>
+
+<h4>解决方法 使用闭包保存环境  使用call apply在该环境下调用方法</h4>
+
+<pre><code>function bind( fn, context ) {
+        return function () {
+            return fn.apply( context, arguments );
+        }
+}
+
+W.addHandler( body, "click", bind( handler.handleClick, handler ) );
+</code></pre>
+
+<blockquote><p>bind()函数接受一个函数和一个环境 用来返回一个在给定环境中调用给定函数的函数，并且将参数原封不动传递</p>
+
+<p>bind函数在内部闭包 使用context的环境调用方法</p>
+
+<p>IE9+ chrome等开始支持原生bind 用法：handler.handleClick.bind(handler);</p></blockquote>
+
+<h3>函数柯里化(function curry)</h3>
+
+<p>函数柯里化基本方法和函数绑定一样：使用闭包返回一个函数。区别在于，在函数被调用时，返回的函数还需要设置一些传入的参数</p>
+
+<pre><code>function curry( fn ) {
+    var args = Array.prototype.slice.call( arguments, 1 );
+    return function () {
+        var innerArgs = Array.prototype.slice.call( arguments ),
+                finalArgs = args.concat( innerArgs );
+        return fn.apply( null, finalArgs );
+    }
+}
+
+function add( num1, num2 ) {
+    return num1 + num2;
+}
+
+//参数可以多次传递 以为最终都会合并成一个数组嘛
+var curriedAdd1 = curry( add, 5 );
+alert( curriedAdd1( 3 ) );  //8
+var curriedAdd2 = curry( add, 5, 3 );
+alert( curriedAdd2() );//8
+</code></pre>
+
+<blockquote><p>curry()函数主要工作是将被返回函数的参数进行排序。
+先用调用slice方法传入参数1 表示被返回的数组包含从第二个参数开始的所有参数
+在内部函数(即外部函数的第一个参数函数)中再用innerArgs数组存放所有传入的参数 最后将外部函数和内部函数的参数合并为finalArgs 以达到保存环境的作用</p></blockquote>
+
+<h4>函数绑定和柯里化一起使用</h4>
+
+<pre><code>function bindCurry( fn, context ) {
+    var args = Array.prototype.slice.call( arguments, 2 );
+    return function () {
+        var innerArgs = Array.prototype.slice.call( arguments ),
+                finalArgs = args.concat( innerArgs );
+        return fn.apply( context, finalArgs );
+    }
+}
+
+var handler1 = {
+    message : "Event handled",
+    handleClick : function ( name, event ) {
+        //alert( name + " : " + event.type );
+    }
+};
+W.addHandler( body, "click", bindCurry( handler1.handleClick, handler1, "my-click" ) );
+</code></pre>
+
+<h3>防篡改对象</h3>
+
+<h4>防篡改级别一:不可扩展的对象Object.preventExtensions()</h4>
+
+<blockquote><p>Object.preventExtensions()可以阻止向对象添加扩展  查看是否可扩展Object.isExtensible()</p>
+
+<p>默认情况下任何对象都是可自由扩展的 任何时候都可以向对象添加属性和方法</p></blockquote>
+
+<pre><code>var ob1 = {name : "zodiac"};
+   ob1.age = 22;
+   alert(ob1.age);//22
+
+   Object.preventExtensions( ob1 );
+   ob1.carrer = "font-end";
+   alert(ob1.carrer);//undefined
+   alert(Object.isExtensible(ob1));//false
+</code></pre>
+
+<h4>防篡改级别二:密封的对象Object.seal()</h4>
+
+<blockquote><p>设置Object.seal()后对象不仅不能扩展 已有成员的configurable（可配置的）也被设为false变为不可配置 不能删除改对象和它的属性和方法 也不能增加新的方法或属性 但可以修改</p>
+
+<p>Object.isSealed查看是否被密封</p></blockquote>
+
+<pre><code>   var ob2 = {name : "zodiac"};
+   Object.seal( ob2 );
+   ob2.name = "xl";
+   delete ob2.name;
+   alert(ob1.name);//xl
+   alert(Object.isExtensible(ob1));//false
+   alert(Object.isSealed(ob2));//true
+</code></pre>
+
+<h4>防篡改最高级别三:冻结的对象 Object.freeze()</h4>
+
+<blockquote><p>Object.isFrozen() 对Javascript库的作者而言 冻结对象可以保证库的和性对象不被修改</p>
+
+<p>即不可扩展 又是密封的 而且对象数据属性的[[Writable]]特性会被设置为false，如果定义了[[set]]函数，访问器的属性仍然可写</p></blockquote>
+
+<pre><code>var ob3 = {name : "zodiac"};
+Object.freeze( ob2 );
+ob3.name = "xl";
+delete ob2.name;
+alert(ob1.name);//zodiac
+alert(Object.isExtensible(ob1));//false
+alert(Object.isSealed(ob2));//true
+alert(Object.isFrozen(ob2));//true
+</code></pre>
+
+<blockquote><p>备注：手动修改对象的configurable（可配置的）或 [[Writable]] 属性是无效的</p></blockquote>
+
+<h3>高级计时器</h3>
+
+<p>javascript是单线程的 计时器仅仅只是计划代码在未来每个时间进行。执行时机不能保证 实际上浏览器负责进行排序，指派某段代码在某个时间点运行的优先级</p>
+
+<p>定时器对队列的工作方式是：在特定的时间后将代码插入。但并不意味着插入的代码会立刻执行。只是会排入队列尽快执行。</p>
+
+<h4>Yielding Processes生产过程</h4>
+
+<p>运行在浏览器的JavaScript被分配了一定数量的资源，被严格限制了内存大小和处理器时间 以防恶意web程序员搞挂计算机，如果代码运行时间超过特定时间或超过特定语句数量就会弹出错误</p>
+
+<p>解决方法：使用定时器分割处理长时间的循环等造成脚本运行时间较长的代码段</p>
+
+<pre><code>function chunk( array, process, context ) {
+
+
+    setTimeout( function () {
+        var item = array.shift();
+        process.call( context, item );
+
+        if ( array.length &gt; 0 ) {
+            setTimeout( arguments.callee, 100 );
+        }
+    }, 100 )
+}
+
+var data = [21, 1213, 31, 31, 31];
+
+function printValue( item ) {
+    document.querySelector( "body" ).innerHTML += item;
+}
+
+chunk( data, printValue );
+</code></pre>
+
+<blockquote><p>chunk函数将连续的代码分块较小间隔执行；
+array要处理的项目的数组，process处理项目的函数，context函数运行的环境当函数处于全局作用域时刻省略；直接传递数组，数组中的条目也会被改变，如果向保持原数组不变，可以传递该数组的克隆个函数data.concat()。</p></blockquote>
+
+<h4>函数节流 避免高频率触发 造成浏览器崩溃 只要代码是周期执行的都应该使用节流</h4>
+
+<blockquote><p>浏览器的某些计算和处理要比其他昂贵很多。
+ 如：DOM操作比非DOM交互需要更多的CPU和内存。连续尝试过多的DOM操作可能使浏览器挂起或崩溃。
+ 在IE中使用onresize处理事件时，当浏览器大小调整时会连续触发，可能导致浏览器崩溃，这类情况就可以使用定时器对该函数节流。</p></blockquote>
+
+<pre><code>function throttle( method, context ) {
+    clearTimeout( method.tId );
+    method.tId = setTimeout( function () {
+        method.call( context );
+    }, 100 )
+}
+
+function resize() {
+    document.querySelector( "body" ).innerHTML += "&lt;br/&gt;--------" + document.querySelector( "body" ).offsetWidth;
+}
+
+W.addHandler( window, "resize", function () {
+    throttle( resize );
+} );
+</code></pre>
+]]></content:encoded>
+      <dc:date>2015-05-22T18:32:25+00:00</dc:date>
+    </item>
+    <item>
+      <title>离线应用和客户端存储</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/20/%E7%A6%BB%E7%BA%BF%E5%BA%94%E7%94%A8%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AD%98%E5%82%A8.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Wed, 20 May 2015 17:17:42 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/20/%E7%A6%BB%E7%BA%BF%E5%BA%94%E7%94%A8%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AD%98%E5%82%A8.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<h3>离线检测</h3>
+
+<p>判断设备是否能上网 navigator.onLine</p>
+
+<p>window事件online offline 在网络环境发生变化时触发</p>
+
+<pre><code>alert( navigator.onLine );
+
+W.addHandler( window, "online", function () {
+    alert( "online" );
+} );
+W.addHandler( window, "offline", function () {
+    alert( "offline" );
+} );
+</code></pre>
+
+<h3>应用程序缓存（Application Cache）</h3>
+
+<p>HTML5 引入了应用程序缓存，这意味着 web 应用可进行缓存，并可在没有因特网连接时进行访问</p>
+
+<p>应用程序缓存为应用带来三个优势：</p>
+
+<ul>
+<li>离线浏览 - 用户可在应用离线时使用它们</li>
+<li>速度 - 已缓存资源加载得更快</li>
+<li><p>减少服务器负载 - 浏览器将只从服务器下载更新过或更改过的资源。</p>
+
+<pre><code>  &lt;html manifest="demo.appcache"&gt;
+</code></pre></li>
+</ul>
+
+
+<blockquote><p>指定manifest文件</p>
+
+<p>manifest 文件的建议的文件扩展名是：".appcache"。
+manifest 文件需要配置正确的 MIME-type，即 "text/cache-manifest"。必须在 web 服务器上进行配置。</p></blockquote>
+
+<p>manifest 文件可分为三个部分：</p>
+
+<ul>
+<li>CACHE MANIFEST - 在此标题下列出的文件将在首次下载后进行缓存</li>
+<li>NETWORK - 在此标题下列出的文件需要与服务器的连接，且不会被缓存</li>
+<li>FALLBACK - 在此标题下列出的文件规定当页面无法访问时的回退页面（比如 404 页面)</li>
+</ul>
+
+
+<p>更新缓存
+一旦应用被缓存，它就会保持缓存直到发生下列情况：</p>
+
+<ol>
+<li>用户清空浏览器缓存</li>
+<li>manifest 文件被修改</li>
+<li>由程序来更新应用缓存</li>
+</ol>
+
+
+<p>实例 - 完整的 Manifest 文件</p>
+
+<pre><code>CACHE MANIFEST
+# 2012-02-21 v1.0.0
+/theme.css
+/logo.gif
+/main.js
+
+NETWORK:
+login.asp
+
+FALLBACK:
+/html5/ /404.html
+</code></pre>
+
+<blockquote><p>以 "#" 开头的是注释行，但也可满足其他用途。应用的缓存会在其 manifest 文件更改时被更新。如果您编辑了一幅图片，或者修改了一个 JavaScript 函数，这些改变都不会被重新缓存。更新注释行中的日期和版本号是一种使浏览器重新缓存文件的办法</p></blockquote>
+
+<h3>数据存储</h3>
+
+<h4>HTTP cookie</h4>
+
+<p>该标准要求服务器对任意HTTP请求发送Set-Cookie HTTP头作为相应的一部分，其中包括会话信息</p>
+
+<ol>
+<li><p>限制</p>
+
+<ul>
+<li>cookie在性质上是绑定在特定的域名下的。</li>
+<li>当设定了一个cookie后，再给创建它的域名发送请求时，request header会包含所有cookie。</li>
+<li>这个限制确保了存储在cookie中的信息只能让批准的接受者访问，而无法被其他域访问</li>
+<li>cookie在客户端计算机大小和数量都有限制 根据浏览器不同单个域下最多20-50个 整个cookie长度限制在2095b</li>
+</ul>
+</li>
+<li><p>cookie的构成  只有名值对儿才会被发送到服务器 其他参数都是服务器给浏览器的指示</p>
+
+<ul>
+<li>名称name  需要经过URL编码</li>
+<li>值value</li>
+<li>域domain</li>
+<li>路径path</li>
+<li>失效时间expires</li>
+<li>安全标志secure</li>
+</ul>
+
+
+<blockquote><p>设置了secure标志的cookie只能通过SSL加密连接才能传输</p></blockquote></li>
+<li><p>在请求头中设置cookie</p>
+
+<pre><code> Content-type:text/html
+ Set-Cookie:name-value;expires=Mon,22-Jan-07 07:10:24 GMT;domain=.wrox.com;path=/;secure
+ Other-header:other-header-value
+ xhr.setRequestHeader( key, value )
+</code></pre></li>
+<li><p>JavaScript中的cookie</p>
+
+<pre><code>    //返回所有cookie字符串 ;分割
+    consile.log(document.cookie);//"a=b;c=d"
+
+    //并不会覆盖原来的cookie 除非名称已经存在
+    document.cookie="key=value";
+</code></pre></li>
+<li><p>子cookie</p>
+
+<p> 为了绕开浏览器对单域名下的cookie的限制，使用子cookie</p>
+
+<pre><code> key=subKey1=subValue1&amp;subKey2=subValue2;
+</code></pre>
+
+<blockquote><p>基本原理是在value中包含子cookie</p>
+
+<p>虽然扰过了cookie数量限制却增加了cookie的长度</p></blockquote></li>
+</ol>
+
+
+<h4>Web存储机制</h4>
+
+<h5>Storage类型</h5>
+
+<p>HTML5 Storage类型都有公共方法setItem getItem removeItem  key的大小限制根据浏览器2.5M--5M</p>
+
+<ol>
+<li><p>sessionStorage保持到会话结束，即保存到浏览器关闭 合适会话类的小段数据</p>
+
+<pre><code> //使用方法存储数据
+ sessionStorage.setItem( "name", "zodiac" );
+
+ //使用属性存储数据
+ sessionStorage.age = "22";
+
+ //使用方法获取数据
+ var name = sessionStorage.getItem( "name" );
+
+ //使用属性获取数据
+ var age = sessionStorage.age;
+
+ //删除值 使用delete删除一个值 在Webkit中无效
+ sessionStorage.removeItem("name");
+ delete sessionStorage.age
+
+ //逆序获取指定位置上的名字
+ W.log( sessionStorage.key( 0 ) );
+</code></pre></li>
+<li><p>localStorage HTML5标准 老版本使用globalStorage 跨会话第存储数据，但有特定的访问限制</p>
+
+<ul>
+<li>globalStorage需要指定那些域可以访问该数据</li>
+<li>要访问localStorage,页面必须来自同一域名(子域名无效),同一协议，同一端口上。相当于globalStorage[location.host]</li>
+<li>两者的数据都保存到通过JavaScript删除或者用户清除浏览器缓存为止</li>
+</ul>
+</li>
+</ol>
+
+
+<blockquote><p>方法：和sessionStorage类似</p>
+
+<p>事件：storage 为Storage对象进行任何修改，都会在文档上触发storage事件 set get remove delete等都会触发</p></blockquote>
+
+<p> 兼容方法：</p>
+
+<pre><code>    function getLocalStorage() {
+        if ( typeof localStorage == "object" ) {
+            return localStorage;
+        }
+        else if ( typeof globalStorage == "object" ) {
+            return globalStorage[location.host];
+        }
+        else {
+            throw new Error( "Local Storage not available" );
+        }
+    }
+    var localStorage = getLocalStorage();
+</code></pre>
+
+<h5>IndexedDB</h5>
+
+<p>IndexedDB 是一个为了能够在客户端存储可观数量的结构化数据，并且在这些数据上使用索引进行高性能检索的 API。</p>
+
+<blockquote><p>虽然 DOM 存储 对于存储少量数据是非常有用的，但是它对大量结构化数据的存储就显得力不从心了。IndexedDB 则提供了这样的一个解决方案。</p>
+
+<p>IndexedDB 分别为同步和异步访问提供了单独的 API 。同步 API 本来是要用于仅供 Web Workers 内部使用，但是还没有被任何浏览器所实现。异步 API 在 Web Workers 内部和外部都可以使用。</p></blockquote>
+]]></content:encoded>
+      <dc:date>2015-05-20T17:17:42+00:00</dc:date>
+    </item>
+    <item>
+      <title>web通信</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/19/web%E9%80%9A%E4%BF%A1.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Tue, 19 May 2015 23:13:42 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/19/web%E9%80%9A%E4%BF%A1.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<h3>AJAX</h3>
+
+<p>异步JavaScript和XML</p>
+
+<p>ajax的核心是通过XmlHttpRequest获取非本页内</p>
+
+<blockquote><p>通过在后台与服务器进行少量数据交换，AJAX 可以使网页实现异步更新。这意味着可以在不重新加载整个网页的情况下，对网页的某部分进行更新。</p></blockquote>
+
+<h3>跨域请求</h3>
+
+<h4>服务端和客户端约定 XHR按照CORS规范要求服务器发送特定的http头</h4>
+
+<blockquote><p>客户端设置Origin:http://www.zodiac.com</p>
+
+<p>服务端设置Access-Control-Allow-Origin:http://www.zodiac.com或者Access-Control-Allow-Origin:*</p></blockquote>
+
+<pre><code>header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST');
+</code></pre>
+
+<h4>其他跨域技术</h4>
+
+<blockquote><p>背景：Web页面上调用js文件时则不受是否跨域的影响,凡是拥有"src"这个属性的标签都拥有跨域的能力，比如<code>&lt;script&gt;</code>、<code>&lt;img&gt;</code>、<code>&lt;iframe&gt;</code>等</p></blockquote>
+
+<h5>图像Ping 使用<img>标签</h5>
+
+<pre><code>var url = "http://www.dell.com/?name=zodiac";
+function imgPing( url, callBack ) {
+    var img = new Image();
+    img.onload = img.onerror = callBack;
+    img.src = url;
+}
+imgPing( url, function () {
+} );
+</code></pre>
+
+<blockquote><p>通常用来跟踪用户点击页面或者广告的曝光次数</p>
+
+<p>优点：不修改服务器代码  简单 单向</p>
+
+<p>不足：1只能发送GET请求 2无法访问服务器的响应脚本 只是浏览器与服务器间的单向通行</p></blockquote>
+
+<h5>JSONP协议(建议使用XHR按照CORS规范代替)</h5>
+
+<p>该协议的一个要点就是允许用户传递一个callback参数给服务端，然后服务端返回数据时会将这个callback参数作为函数名来包裹住JSON数据，这样客户端就可以随意定制自己的函数来自动处理返回数据了。</p>
+
+<blockquote><p>jsonp的核心是动态添加<code>&lt;script&gt;</code>标签来调用服务器提供的js脚本</p>
+
+<p>jsonP本身就是一个get请求，而script节点本身也是一个get请求，这个思想是利用<code>&lt;script&gt;</code>标签没有跨域限制的“漏洞”,通过后端的配合（后端输出的 response text必须符合js语法）更好的利用了get请求。</p>
+
+<p>前端封装一个方法，通过这个方法把请求注册的回调指向全局的一个具名函数，同时把具名函数的函数名和参数通过get请求传递给后端。来达到与第三方通讯的目的。</p></blockquote>
+
+<p>当需要通讯时，本站脚本创建一个<code>&lt;script&gt;</code>元素，地址指向第三方的API网址，形如：</p>
+
+<pre><code>&lt;script src="http://www.example.net/api?param1=1&amp;param2=2"&gt;&lt;/script&gt;
+</code></pre>
+
+<p>并提供一个回调函数来接收数据（函数名可约定，或通过地址参数传递）。
+第三方产生的响应为json数据的包装（故称之为jsonp，即json padding），形如：</p>
+
+<pre><code>callback({"name":"hax","gender":"Male"})
+</code></pre>
+
+<p>这样浏览器会调用callback函数，并传递解析后json对象作为参数。本站脚本可在callback函数里处理所传入的数据。</p>
+
+<h4>Web Sockets 全双工 双向的通信 使用自定义协议ws 而不是使用http协议 ie不支持</h4>
+
+<p>Web Sockets用于浏览器和服务器的通信</p>
+
+<p>同源策略对socket不适用 因此可以通过socket打开任何站点链接</p>
+
+<pre><code>var socket = new WebSocket( "ws://www.zodiac.com/service" );
+
+//只能发送纯文本 可以使用JSON.stringify 字符串化
+socket.send( "Hello World" );
+
+socket.onmessage = function ( event ) {
+    var data = event.data;
+};
+socket.onclose = function ( event ) {
+    console.log( event.wasClean + "  " + event.code + "   " + event.reason );
+};
+</code></pre>
+
+<h4>web message</h4>
+
+<p>用于浏览器窗口之间的通信</p>
+
+<pre><code> var iframeWindow = document.querySelector("iframe").contentWindow;
+
+//向iframeWindow发送的信息和表明自己身份
+iframeWindow.postMessage("a message", "http://www.webMessagePost.com");
+
+
+//监控信息
+W.addHandler(window, "message", function (event) {
+    if (event.origin == "http://www.webMessagePost.com") { //验证发送消息的域是已知的域
+        var data = event.data; //do something
+
+        //可选:向来源窗口发送回执
+        event.source.postMessage("I received your present", "http://www.hello.com");
+    }
+})
+</code></pre>
+]]></content:encoded>
+      <dc:date>2015-05-19T23:13:42+00:00</dc:date>
+    </item>
+    <item>
+      <title>css规范</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/18/%E6%B5%8F%E8%A7%88%E5%99%A8%E6%9F%A5%E7%9C%8B%E4%B8%80%E4%B8%AA%E5%85%83%E7%B4%A0%E5%8A%A8%E6%80%81%E7%BB%91%E5%AE%9A%E7%9A%84%E4%BA%8B%E4%BB%B6.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Mon, 18 May 2015 20:12:22 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/18/%E6%B5%8F%E8%A7%88%E5%99%A8%E6%9F%A5%E7%9C%8B%E4%B8%80%E4%B8%AA%E5%85%83%E7%B4%A0%E5%8A%A8%E6%80%81%E7%BB%91%E5%AE%9A%E7%9A%84%E4%BA%8B%E4%BB%B6.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<ol>
+<li><p>原生：</p>
+
+<p>Chromr dev tools 〉Source 〉右下角绑定监听 dom event, 比如 click, 然后点
+击这么element, 就会跳到相应的 js 代码</p></li>
+<li><p>jquery：</p>
+
+<pre><code>$("a#id-258").data("events")['click']
+</code></pre></li>
+</ol>
+
+]]></content:encoded>
+      <dc:date>2015-05-18T20:12:22+00:00</dc:date>
+    </item>
+    <item>
+      <title>使用FormData对象</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/17/%E4%BD%BF%E7%94%A8FormData%E5%AF%B9%E8%B1%A1.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Sun, 17 May 2015 19:08:22 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/17/%E4%BD%BF%E7%94%A8FormData%E5%AF%B9%E8%B1%A1.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<p>利用FormData对象,你可以使用一系列的键值对来模拟一个完整的表单,然后使用XMLHttpRequest发送这个"表单".</p>
+
+<blockquote><p>FormData对象可以发送的数据格式：</p>
+
+<p>a Blob, File, or a string, if neither, the value is converted to a string</p>
+
+<p>对象和数组 请自觉JSON.stringify</p></blockquote>
+
+<h3>创建一个FormData对象</h3>
+
+<p>你可以先创建一个空的FormData对象,然后使用append()方法向该对象里添加字段,如下:</p>
+
+<pre><code>var oMyForm = new FormData();
+
+oMyForm.append("username", "Groucho");
+oMyForm.append("accountnum", 123456); // 数字123456被立即转换成字符串"123456"
+
+// fileInputElement中已经包含了用户所选择的文件
+oMyForm.append("userfile", fileInputElement.files[0]);
+
+var oFileBody = "&lt;a id="a"&gt;&lt;b id="b"&gt;hey!&lt;/b&gt;&lt;/a&gt;"; // Blob对象包含的文件内容
+var oBlob = new Blob([oFileBody], { type: "text/xml"});
+
+oMyForm.append("webmasterfile", oBlob);
+
+var oReq = new XMLHttpRequest();
+oReq.open("POST", "http://foo.com/submitform.php");
+oReq.send(oMyForm);
+</code></pre>
+
+<blockquote><p>注: 字段"userfile"和"webmasterfile"的值都包含了一个文件.通过 FormData.append()方法赋给字段"accountnum"的数字被自动转换为字符(字段的值可以是一个Blob对象,一个File对象,或者一个字符串,剩下其他类型的值都会被自动转换成字符串).</p>
+
+<p>在该例子中,我们创建了一个名为oMyForm的FormData对象,该对象中包含了名为"username", "accountnum", "userfile" 以及 "webmasterfile"的字段名,然后使用XMLHttpRequest的send()方法把这些数据发送了出去."webmasterfile"字段的值不是一个字符串,还是一个Blob对象.</p></blockquote>
+
+<h3>使用HTML表单来初始化一个FormData对象</h3>
+
+<p>可以用一个已有的<code>&lt;form&gt;</code>元素来初始化FormData对象,只需要把这个form元素作为参数传入FormData构造函数即可:</p>
+
+<pre><code>var newFormData = new FormData(someFormElement);
+</code></pre>
+
+<p>例如:</p>
+
+<pre><code>var formElement = document.getElementById("myFormElement");
+var oReq = new XMLHttpRequest();
+oReq.open("POST", "submitform.php");
+oReq.send(new FormData(formElement));
+</code></pre>
+
+<p>你还可以在已有表单数据的基础上,继续添加新的键值对,如下:</p>
+
+<pre><code>var formElement = document.getElementById("myFormElement");
+formData = new FormData(formElement);
+formData.append("serialnumber", serialNumber++);
+oReq.send(formData);
+</code></pre>
+
+<p>你可以通过这种方式添加一些不想让用户编辑的固定字段,然后再发送.</p>
+
+<h3>使用FormData对象发送文件</h3>
+
+<p>你还可以使用FormData来发送二进制文件.首先在HTML中要有一个包含了文件输入框的form元素:</p>
+
+<pre><code>&lt;form enctype="multipart/form-data" method="post" name="fileinfo"&gt;
+  &lt;label&gt;Your email address:&lt;/label&gt;
+  &lt;input type="email" autocomplete="on" autofocus name="userid" placeholder="email" required size="32" maxlength="64" /&gt;&lt;br /&gt;
+  &lt;label&gt;Custom file label:&lt;/label&gt;
+  &lt;input type="text" name="filelabel" size="12" maxlength="32" /&gt;&lt;br /&gt;
+  &lt;label&gt;File to stash:&lt;/label&gt;
+  &lt;input type="file" name="file" required /&gt;
+&lt;/form&gt;
+&lt;div id="output"&gt;&lt;/div&gt;
+&lt;a href="javascript:sendForm()"&gt;Stash the file!&lt;/a&gt;
+</code></pre>
+
+<p>然后你就可以使用下面的代码来异步的上传用户所选择的文件:</p>
+
+<pre><code>function sendForm() {
+  var oOutput = document.getElementById("output");
+  var oData = new FormData(document.forms.namedItem("fileinfo"));
+
+  oData.append("CustomField", "This is some extra data");
+
+  var oReq = new XMLHttpRequest();
+  oReq.open("POST", "stash.php", true);
+  oReq.onload = function(oEvent) {
+    if (oReq.status == 200) {
+      oOutput.innerHTML = "Uploaded!";
+    } else {
+      oOutput.innerHTML = "Error " + oReq.status + " occurred uploading your file.&lt;br \/&gt;";
+    }
+  };
+
+  oReq.send(oData);
+}
+</code></pre>
+
+<p>你还可以不借助HTML表单,直接向FormData对象中添加一个File对象或者一个Blob对象:</p>
+
+<pre><code>data.append("myfile", myBlob);
+</code></pre>
+
+<blockquote><p>如果FormData对象中的某个字段值是一个Blob对象,则在发送http请求时,代表该Blob对象所包含文件的文件名的"Content-Disposition"请求头的值在不同的浏览器下有所不同,Firefox使用了固定的字符串"blob,"而Chrome使用了一个随机字符串.</p></blockquote>
+
+<p>你还可以使用jQuery来发送FormData,但必须要正确的设置相关选项:</p>
+
+<pre><code>var fd = new FormData(document.getElementById("fileinfo"));
+fd.append("CustomField", "This is some extra data");
+$.ajax({
+  url: "stash.php",
+  type: "POST",
+  data: fd,
+  processData: false,  // 告诉jQuery不要去处理发送的数据
+  contentType: false   // 告诉jQuery不要去设置Content-Type请求头
+});
+</code></pre>
+]]></content:encoded>
+      <dc:date>2015-05-17T19:08:22+00:00</dc:date>
+    </item>
+    <item>
+      <title>创建和触发event</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/17/%E5%88%9B%E5%BB%BA%E5%92%8C%E8%A7%A6%E5%8F%91event.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Sun, 17 May 2015 18:54:33 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/17/%E5%88%9B%E5%BB%BA%E5%92%8C%E8%A7%A6%E5%8F%91event.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<h3>自定义事件 （Custom events)</h3>
+
+<pre><code>var event = new Event('build');
+
+// Listen for the event.
+elem.addEventListener('build', function (e) { ... }, false);
+
+// Dispatch the event.
+elem.dispatchEvent(event);
+</code></pre>
+
+<blockquote><p>绝大多数当代浏览器中都会支持这个构造函数（Internet Explorer 例外</p></blockquote>
+
+<h3>添加自定义数据 – CustomEvent</h3>
+
+<p>CustomEvent 接口可以为 event 对象添加更多的数据。例如，event 可以创建如下：</p>
+
+<pre><code>var event = new CustomEvent('build', { 'detail': "time"});
+</code></pre>
+
+<blockquote><p>上面的代码允许在事件帧听器中访问更多的数据：</p></blockquote>
+
+<pre><code>function eventHandler(e) {
+  log('The time is: ' + e.detail);
+}
+</code></pre>
+
+<h3>过时的方法</h3>
+
+<p>这种过时的使用API创建事件的方法是来自 Java的灵感。实例代码如下所示：</p>
+
+<pre><code>// Create the event.
+var event = document.createEvent('Event');
+
+// Define that the event name is 'build'.
+event.initEvent('build', true, true);
+
+// Listen for the event.
+document.addEventListener('build', function (e) {
+     // e.target matches document from above
+}, false);
+
+// target can be any Element or other EventTarget.
+document.dispatchEvent(event);
+</code></pre>
+]]></content:encoded>
+      <dc:date>2015-05-17T18:54:33+00:00</dc:date>
+    </item>
+    <item>
+      <title>上传文件和自动下载文件</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/14/%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6%E5%92%8C%E8%87%AA%E5%8A%A8%E4%B8%8B%E8%BD%BD%E6%96%87%E4%BB%B6.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Thu, 14 May 2015 23:36:33 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/14/%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6%E5%92%8C%E8%87%AA%E5%8A%A8%E4%B8%8B%E8%BD%BD%E6%96%87%E4%BB%B6.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<h3>上传文件</h3>
+
+<blockquote><p>input file change事件 FileReader获取 input.files(选取的文件) 在FileReader获加载器中获取文件详细信息</p>
+
+<p>这里e.target.result就是base64编码</p></blockquote>
+
+<pre><code>$( "input" ).bind( "change", function () {
+    var reader = new FileReader(), htmlImage;
+    reader.onload = function ( e ) {
+        htmlImage = '&lt;img src="' + e.target.result + '" /&gt;';
+        $( "body" ).append( htmlImage );
+    };
+    reader.readAsDataURL( $( this ).get( 0 ).files[0] );
+} )
+</code></pre>
+
+<h3>下载文件</h3>
+
+<blockquote><p>前端很多项目中，都有文件下载的需求，特别是JS生成文件内容，然后让浏览器执行下载操作（例如在线图片编辑、在线代码编辑、iPresst等;但受限于浏览器，很多情况下我们都只能给出个链接，让用户点击打开-》另存为。</p></blockquote>
+
+<h4>方法一:a标签的download</h4>
+
+<pre><code>&lt;a href=”file.js”&gt;file.js&lt;/a&gt;
+</code></pre>
+
+<blockquote><p>用户点击这个链接的时候，浏览器会打开并显示链接指向的文件内容，显然，这并没有实现我们的需求。HTML5中给a标签增加了一个download属性，只要有这个属性，点击这个链接时浏览器就不在打开链接指向的文件，而是改为下载（目前只有chrome、firefox和opera支持）。下载时会直接使用链接的名字来作为文件名，但是是可以改的，只要给download加上想要的文件名即可(需要加上文件格式 不加默认为html)如：download=“newName.js”。</p></blockquote>
+
+<pre><code>&lt;a href=”file.js”&gt;file.js&lt;/a&gt;
+</code></pre>
+
+<h4>方法二:a标签href base64</h4>
+
+<p>但是这样还不够，以上的方法只适合用在文件是在服务器上的情况。如果在浏览器端js生成的内容，想让浏览器进行下载要如何办到呢？</p>
+
+<p>其实还是有办法办到的，相信很多人都多少听过了DataURI这个词，比较常见的就是图片的src，如：</p>
+
+<pre><code>&lt;img src=”data:image/gif;base64,R0lGOXXXXX"&gt;
+</code></pre>
+
+<p>那么，现在要将js生成的内容进行下载就有法可依了。封装成一个方法如下：</p>
+
+<p>function downloadFile(aLink, fileName, content){</p>
+
+<pre><code>aLink.download = fileName;
+aLink.href = "data:text/plain," + content;
+</code></pre>
+
+<p>}</p>
+
+<p>调用downloadFile之后，用户点击链接，就能触发浏览器下载。
+但是，还不够，上面的办法有两个硬伤：</p>
+
+<ol>
+<li>下载的文件类型限制死了</li>
+<li>下载还要再点击一下，太麻烦啦</li>
+</ol>
+
+
+<h4>方法三: URL.createObjectURL+创建点击事件自动触发</h4>
+
+<p>要解决文件类型的问题，可以用浏览器的新API（URL.createObjectURL）来解决问题</p>
+
+<blockquote><p>URL.createObjectURL通常都是用来创建图片的DataURI用来显示图片，这里用来下载文件，让浏览器来帮我们设定好文件类型。</p>
+
+<p>URL.createObjectURL的参数是File对象或者Blob对象，File对象也就是通过input[type=file]选择的文件，Blob对象是二进制大对象，详细说明可参考这里。</p>
+
+<p>现在，我们只要content数据创建一个ObjectURL并赋值给aLink即可解决文件类型的限制问题。
+文件的自动下载也挺好办，自己构建一个UI点击事件，再自动触发下，就能实现自动下载啦。</p></blockquote>
+
+<p>现在来看看选择一个文件然后使用downloadFile方法转化为base64重新下载并改名的代码：</p>
+
+<pre><code>function downloadFile(fileName, content){
+    var aLink = document.createElement('a'),
+        blob = new Blob([content]),
+        evt = document.createEvent("HTMLEvents");
+
+    evt.initEvent("click", false, false);
+    aLink.download = fileName;
+    aLink.href = URL.createObjectURL(blob);
+    aLink.dispatchEvent(evt);
+}
+
+$( "input[type='file']" ).bind( "change", function () {
+    var reader = new FileReader(), htmlImage;
+    reader.onload = function ( e ) {
+        htmlImage = '&lt;img src="' + e.target.result + '" /&gt;';
+        $( "body" ).append( htmlImage );
+        downloadFile("新文件名",e.target.result)
+    };
+    reader.readAsDataURL( $( this ).get( 0 ).files[0] );
+} )
+</code></pre>
+
+<p>现在，只要一调用downloadFile，文件就自动下载</p>
+
+<p>占坑：下载的文件是base64数据  如果怎样才能还原成可以打开的文件呢？</p>
+]]></content:encoded>
+      <dc:date>2015-05-14T23:36:33+00:00</dc:date>
+    </item>
+    <item>
+      <title>URI</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/13/URI.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Wed, 13 May 2015 23:22:11 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/13/URI.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<h3>是URI，不是URL</h3>
+
+<blockquote><p>URL是uniform resource locator的缩写，是一个特定资源的协议（用什么方式去获取数据）和地址的组合。每一个公开可访问的资源，例如图片，JS文件，HTML文件或者样式 表文件，都有一个URL告诉浏览器从哪里下载它们。浏览器会根据这个URL建立一个链接，并开始下载或执行这个文件。</p>
+
+<p>URL其实也是个URI，URI是uniform resource identifier的缩写。URI指定了一个协议用来接收信息，包括一些关于资源的额外的信息。那些额外的信息可能是一个地址也可能不是（如果是的话， 那么URI就是URL了），但是它总是跟一个特定的协议和有关联。因此，既然不包含地址信息，data URI也就不是URL了。</p></blockquote>
+
+<h3>Data URI的格式</h3>
+
+<p>data URI的格式很简单。基本的格式如下：</p>
+
+<blockquote><p>data:[][;charset=][;base64],</p>
+
+<p>在这个格式中，data：URI的协议，表明这是一个data URI。第二部分，MIME type，表明了要呈现的数据的类型。拿PNG图片举个例子，它的MIME type是image/png。如果没有指定，MIME type将会默认为text/plain。charset在大多数情况下可以无视，对于图片来说它根本没用。下一部分指明了使用的编码。跟流行观念相反， 你不一定要用base 64编码。如果内容不是用base 64进行编码，那么这些数据就会使用标准的URL编码（对URL安全的ASCII字符将会保留原样显示，其他会显示成%xx格式的十六进制编码）进行编 码。编码后的数据可能会包含一些没用空格，</p></blockquote>
+
+<h3>Base 64编码</h3>
+
+<p>Base 64编 码是一个编码规则，通过它数据被转化成二进制码，然后组合成一个base 64符号的序列。</p>
+
+<blockquote><p>Base 64符号包括大写和小写的字母A到Z，数字，符号+和/。=号是用来填充用的。你真正需要知道的是 base 64编码会使编码过的数据变得更小。</p></blockquote>
+
+<p>下面的例子是一张GIF图片用base 64进行编码后的data URI（来源）：</p>
+
+<pre><code>data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge
+8WSLf/rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1h
+</code></pre>
+
+<p>data URI最有趣的地方是它可以让你把文件嵌入到其他文件中</p>
+
+<blockquote><p>内联图像使用了data URI把图像数据嵌入到页面中，会增加HTML文档的大小。把内联图像在（已缓存的）样式表里组合起来可以减少HTTP请求和避免页面大小的增加。内联图像还没有得到所有主流浏览器的支持。</p></blockquote>
+
+<p>图片预览也是通过将图片信息转化为base64使用uri实现的</p>
+
+<blockquote><p>input file change事件 FileReader获取 input.files(选取的文件) 在FileReader获加载器中获取文件详细信息</p>
+
+<p>这里e.target.result就是base64编码</p></blockquote>
+
+<pre><code>$( "input" ).bind( "change", function () {
+    var reader = new FileReader(), htmlImage;
+    reader.onload = function ( e ) {
+        htmlImage = '&lt;img src="' + e.target.result + '" /&gt;';
+        $( "body" ).append( htmlImage );
+    };
+    reader.readAsDataURL( $( this ).get( 0 ).files[0] );
+} )
+</code></pre>
+]]></content:encoded>
+      <dc:date>2015-05-13T23:22:11+00:00</dc:date>
+    </item>
+    <item>
+      <title>原型链</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/12/%E5%8E%9F%E5%9E%8B%E9%93%BE.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Tue, 12 May 2015 20:16:33 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/12/%E5%8E%9F%E5%9E%8B%E9%93%BE.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<h3>JavaScript中<code>prototype</code>、<code>__proto__</code>、<code>Function</code>、<code>Object</code>等</h3>
+
+<p><code>__proto__</code>和<code>prototype</code>的关系:</p>
+
+<p><code>__proto__</code>是原型而<code>prototype</code>是一个原型引用属性</p>
+
+<ol>
+<li>一个function的原型(<code>__proto__</code>)实际上是它的父类的<code>prototype</code>属性，而不是它自己的<code>prototype</code>属性（显示原型）</li>
+<li><code>__proto__</code>才是真正的原型 只是它是私有属性 我们一般不使用它 （隐式原型）</li>
+</ol>
+
+
+<p>先看下new方法的具体过程。</p>
+
+<pre><code>var Person = function () { };
+var p = new Person();
+alert(p.__proto__ === Person.prototype);//true
+</code></pre>
+
+<p>new的过程拆分成以下三步:</p>
+
+<ol>
+<li><code>var p={}</code>; 也就是说，初始化一个对象p。</li>
+<li><code>p.__proto__=Person.prototype</code>;//p是Person的派生类 Person是p的父类</li>
+<li><code>Person.call(p)</code>;也就是说构造p，也可以称之为初始化p</li>
+</ol>
+
+
+<p>每个对象都会在其内部初始化一个属性，就是<code>__proto__</code> ，当我们访问一个对象的一个属性时，如果这个对象内部不存在这个属性，那么他就会去<code>__proto__</code> 里找这个属性，这个<code>__proto__</code>又会有自己的 <code>__proto__</code>，于是就这样一直找下去，也就是我们平时所说的原型链的概念。</p>
+
+<p>按照标准， <code>__proto__</code>是不对外公开的，也就是说是个私有属性，但是Firefox的引擎将他暴露了出来成为了一个共有的属性，我们可以对外访问和设置。</p>
+
+<p>其实<code>prototype</code>只是一个假象，他在实现原型链中只是起到了一个辅助作用，换句话说，他只是在new的时候有着一定的价值，而原型链的本质，其实在于<code>__proto__</code>！<code>prototype</code>返回的其实是原型<code>__proto__</code>的引用，并不是真正的原型</p>
+
+<p>Function和Object是js中的两个内置对象。js中包括Function在内的所有都是一个Object
+Function 本身也是一个“类”，然而，所有“类”都是Function的实例，于是 Function instanceof Function为true。同时，所有对象都是 Object 类的实例，Object 本身也是一个对象，所有又有 Object instanceof Object 也为 true。另外，还可以认为 Funciton 类型是<code>Object</code>类型的一个“派生类”，<strong>class Function继承了class Object</strong>，是class Object的一个“子类”</p>
+
+<p>结论：</p>
+
+<ol>
+<li>javaScript中一切皆为对象；所有数据类型都是从Object派生出来的（包括Funciton） Object的原型是所有父原型的顶端,它不再具有父原型,所以结果为null;</li>
+<li>prototype是只有Object和Function及Function的实例才有的一个属性 一个function的派生类的原型指向这个function的prototype属性 说到底prototype也只有在函数new或者原型继承的时候才用的到</li>
+</ol>
+
+]]></content:encoded>
+      <dc:date>2015-05-12T20:16:33+00:00</dc:date>
+    </item>
+    <item>
+      <title>JavaScript之数据类型</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/12/JavaScript%E4%B9%8B%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Tue, 12 May 2015 20:16:33 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/12/JavaScript%E4%B9%8B%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<h3>数据类型</h3>
+
+<p>JavaScript有5种简单数据类型（也称为基本数据类型）</p>
+
+<ul>
+<li>Undefined</li>
+<li>Null</li>
+<li>Boolean</li>
+<li>Number</li>
+<li>String</li>
+</ul>
+
+
+<p>1种复杂数据类型（也称为对象类型）</p>
+
+<ul>
+<li>Object 本质是由一组无序的名值对组成</li>
+</ul>
+
+
+<h3>typeof操作符</h3>
+
+<p>JavaScript是松散类型，不需要提前指定数据类型，因此需要一个方法来检测给定变量的数据类型</p>
+
+<p>对一个值使用typeof操作符可能返回下列字符串：</p>
+
+<ul>
+<li>"undefiend"-----值未定义message</li>
+<li>"boolean"----布尔值</li>
+<li>"string"----字符串</li>
+<li>"number"----数值</li>
+<li>"object"----对象(null也返回"object" 可以用来表示对象不存在，但本身属于NULL类型，并不不是object类型，是一个历史遗留问题)</li>
+<li>"function"----函数</li>
+</ul>
+
+
+<p>缺点：typeof会把所有的数组类型以及用户自定义类型判断为object</p>
+
+<p>优化：使用Object.prototype.toString()匹配出具体的数据类型</p>
+
+<p><code>Object.prototype.toString()</code>有一个妙用，如果我们以某个特别的对象为上下文来调用该函数，它会返回正确的类型。我们需要做的就是手动处理其返回的字符串，最终便能获得typeof应该返回的正确字符串。</p>
+
+<p>可以用来区分：<code>Boolean</code>, <code>Number</code>, <code>String</code>, <code>Function</code>, <code>Array</code>, <code>Date</code>, <code>RegExp</code>, <code>Object</code>, <code>Error</code>等等。</p>
+
+<p><code>jQuery.type()</code>就是这样实现的。以下代码从jQuery源码中抽取出来，可以直接用。</p>
+
+<pre><code>var class2type = {};
+"Boolean Number String Function Array Date RegExp Object Error".split( " " ).forEach( function ( e, i ) {
+    class2type["[object " + e + "]"] = e.toLowerCase();
+} );
+function _typeof( obj ) {
+    if ( obj == null ) {
+        return String( obj );
+    }
+    return typeof obj === "object" || typeof obj === "function" ?
+    class2type[class2type.toString.call( obj )] || "object" :
+            typeof obj;
+}
+</code></pre>
+
+<h3>construct 获取构造函数判断数据类型</h3>
+
+<p>因为typeof会把所有的数组类型以及用户自定义类型判断为object，从而无法知道更确切的信息。而constructor却可以解决这个问题。</p>
+
+<p>typeof可以检查到变量是否有定义，而construct是检查构造函数所以只能检查已定义变量的类型。</p>
+
+<pre><code>var i;
+alert(typeof(i)); //"undefined"
+alert(i.constructor);//报错 i is not defined
+</code></pre>
+
+<p>已定义变量调用construct属性返回的是一个构造函数</p>
+
+<pre><code>var i=1;
+alert(typeof(i)); //"number"
+alert(i.constructor);//function Number() { [native code] }
+</code></pre>
+
+<p>这样我们通过把construcor返回的构造函数转化为字符串，通过寻找匹配字符串（function名）就可以确定具体类型啦</p>
+
+<p>用基于constructor的方法去检查一些基本类型，如</p>
+
+<p>Object / Array / Function / String / Number / Boolean</p>
+
+<p>在你的正则表达式中，一定要将这些单词的首字母大写！！而如果该类型是自定义类型，则根据你定义的时候标识符的写法确定。如：</p>
+
+<pre><code>function user() {};
+var i = new user();
+alert(/user/.test(i.constructor));//true
+</code></pre>
+
+<p>缺点：因为是通过构造函数判断，所以通过原型链继承的情况，constuctor并不能准确判断</p>
+
+<h3>instanceof 获取实例判断数据类型</h3>
+
+<p>通常来讲，使用 instanceof 就是判断一个实例是否属于某种类型</p>
+
+<pre><code>function People(){}
+var dog = new People();
+console.log(dog instanceof People)//true
+</code></pre>
+
+<p>另外，更重的一点是 instanceof 可以在继承关系中用来判断一个实例是否属于它的父类型。例如：</p>
+
+<pre><code> // 判断 dog 是否是 Foo 类的实例 , 并且是否是其父类型的实例
+ function People(){}
+ function Dog(){}
+ Dog.prototype = new People();//JavaScript 原型继承
+
+ var dog = new Dog();
+ console.log(dog instanceof Dog)//true
+ console.log(dog instanceof People)//true
+</code></pre>
+
+<p>instanceof疑惑：</p>
+
+<pre><code> console.log(Object instanceof Object);//true
+ console.log(Object instanceof Function);//true
+ console.log(Function instanceof Object);//true
+ console.log(Function instanceof Function);//true
+ console.log(Number instanceof Number);//false
+ console.log(String instanceof String);//false
+
+ console.log(Function instanceof Object);//true
+
+ console.log(Foo instanceof Function);//true
+ console.log(Foo instanceof Foo);//false
+</code></pre>
+
+<p> 先看看 JavaScript instanceof 运算符思想：</p>
+
+<p> 左边L的隐式原型或者L的更父级的隐式原型 和 右边R的显示原型和相等才返回true</p>
+
+<p> 在原型链总说过JavaScript中一切皆为对象 所有数据类型包括function的最终父类都是Object</p>
+
+<p>而prototype属性是只有Object和Function及Function的实例才有的一个属性且均为Object {}；所以只有Object和Function及Function的实例instanceof才返回true</p>
+
+<pre><code>function instance_of(L, R) {//L 表示左表达式，R 表示右表达式
+    var O = R.prototype;// 取 R 的显示原型
+     L = L.__proto__;// 取 L 的隐式原型
+    while (true) {
+        if (L === null)
+          return false;
+        if (O === L)// 这里重点：当 O 严格等于 L 时，返回 true
+          return true;
+        L = L.__proto__;
+    }
+}
+</code></pre>
+
+<h3>Undefined类型</h3>
+
+<p>Undefined类型只有一个值，即特殊的undefined。在使用var声明了变量但未对其初始化时，这个变量的值就是undefined</p>
+
+<pre><code>var message;
+alert(message == undefined) //true
+</code></pre>
+
+<h3>Null类型</h3>
+
+<p>Null类型也只有一特殊的值是：null。null值表示一个空对象指针，所以typeof操作符检测null时会返回"object"</p>
+
+<pre><code>var message = null;
+alert(typeof message); // "object"
+</code></pre>
+
+<p>如果定义的变量准备在将来用于保存对象，那么最好将该变量初始化为null而不是其他值。这样一来，只要直接检测null值就可以知道相应的变量是否已经保存了一个对象的引用了，例如：</p>
+
+<pre><code>if(message != null)
+{
+    //执行某些操作
+}
+</code></pre>
+
+<p>实际上，undefined值是派生自null值的，因此ECMA-262规定对它们的相等性测试返回true。</p>
+
+<pre><code>alert(undefined == null); //true
+</code></pre>
+
+<p>尽管null和undefined有这样的关系，但它们的用途完全不同。无论在什么情况下都没有必要把一个变量的值显式地设置为undefined，可是同样的规则对null却不适用。</p>
+
+<ul>
+<li>undefined 如果变量是未定义 往往是没有数据或数据结构中没有此字段 基本可以认为是程序的不完善或错误 应尽量避免</li>
+<li>null 一般是人为设置 表示以后会用到这个变量 但是还未定义具体数据 一般用来占坑备用</li>
+</ul>
+
+
+<h3>Boolean类型</h3>
+
+<p>该类型只有两个字面值：true和false。</p>
+
+<p>虽然Boolean类型的字面值只有两个，但JavaScript中所有类型的值都有与这两个Boolean值等价的值。要将一个值转换为其对应的Boolean值，可以调用类型转换函数Boolean()</p>
+
+<pre><code>var message = 'Hello World';
+var messageAsBoolean = Boolean(message);
+</code></pre>
+
+<p> 各种数据类型及其对象的转换规则：</p>
+
+<table>
+<thead>
+<tr>
+<th>数据类型   </th>
+<th>   转换为true的值 </th>
+<th>   转换为false的值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Boolean    </td>
+<td>   true            </td>
+<td>   false</td>
+</tr>
+<tr>
+<td>String </td>
+<td>   任何非空字符串(包括"0")    </td>
+<td>""(空字符串)</td>
+</tr>
+<tr>
+<td>Number </td>
+<td>   任何非零数值（包括无穷大） </td>
+<td>0或NaN（NaN 与所有值都不相等，包括它自己）</td>
+</tr>
+<tr>
+<td>Object </td>
+<td>   任何非null对象     </td>
+<td>   null</td>
+</tr>
+<tr>
+<td>Undefined</td>
+<td> n/a（不适用）      </td>
+<td>   undefined</td>
+</tr>
+</tbody>
+</table>
+
+
+<h3>Number类型</h3>
+
+<p>Number类型用来表示整数和浮点数值</p>
+
+<p>还有一种特殊的数值，即NaN（非数值 Not a Number）。</p>
+
+<p>用于表示一个本来要返回数值的操作数未返回数值的情况（这样就不会抛出错误了）。</p>
+
+<p>例如:</p>
+
+<p>在其他编程语言中，任何数值除以或者余0都会导致错误，从而停止代码执行。但在JavaScript中，会溢出或者返回NaN，因此不会影响其他代码的执行。</p>
+
+<ul>
+<li>任何数字余0都返回NaN</li>
+<li>0除以0返回NaN 其他数字除以0要么上溢出(Infinity)要么下溢出(-Infinity)</li>
+</ul>
+
+
+<p>NaN的特点</p>
+
+<ul>
+<li>任何涉及NaN的操作（例如NaN/10）都会返回NaN</li>
+<li>NaN 与所有值都不相等，包括它自己</li>
+<li>NaN 属性用于引用特殊的非数字值。</li>
+<li>无法使用 for/in 循环来枚举 NaN 属性，也不能用 delete 运算符来删除它。</li>
+</ul>
+
+
+<p>JavaScript中有一个isNaN()函数，这个函数接受一个参数，该参数可以使任何类型，而函数会帮我们确定这个参数是否“不是数值”。isNaN()在接收一个值之后，会尝试将这个值转换为数值。某些不是数值的值会直接转换为数值。而任何不能被转换为数值的值都会导致这个函数返回true。例如：</p>
+
+<pre><code>alert(isNaN(NaN));    //true
+alert(isNaN(10));    //false(10是一个数值)
+alert(isNaN("10"));    //false(可能被转换为数值10)
+alert(isNaN("blue"));    //true(不能被转换为数值)
+alert(isNaN(true));    //false(可能被转换为数值1)
+</code></pre>
+
+<p>有3个函数可以把非数值转换为数值：Number()、parseInt()和parseFloat()。第一个函数，即转型函数Number()可以用于任何数据类型，而另外两个函数则专门用于把字符串转换成数值。这3个函数对于同样的输入会返回不同的结果。</p>
+
+<p>Number()函数的转换规则如下：</p>
+
+<ul>
+<li>如果是Boolean值，true和false将分别被替换为1和0</li>
+<li>如果是数字值，只是简单的传入和返回</li>
+<li>如果是null值，返回0</li>
+<li>如果是undefined，返回NaN</li>
+<li><p>如果是字符串，遵循下列规则：</p>
+
+<ul>
+<li>如果字符串中只包含数字，则将其转换为十进制数值，即”1“会变成1，”123“会变成123，而”011“会变成11（前导的0被忽略）</li>
+<li>如果字符串中只包含有效的浮点格式，如”1.1“，则将其转换为对应的浮点数（同样，也会忽略前导0）</li>
+<li>如果字符串中只包含有效的十六进制格式，例如”0xf“，则将其转换为相同大小的十进制整数值</li>
+<li>如果字符串是空的，则将其转换为0</li>
+<li>如果字符串中包含除了上述格式之外的字符，则将其转换为NaN</li>
+</ul>
+</li>
+<li><p>如果是对象，则调用对象的valueOf()方法,然后依照前面的规则转换返回的值。如果转换的结果是NaN，则调用对象的toString()方法，然后再依次按照前面的规则转换返回的字符串值。</p></li>
+</ul>
+
+
+<p>由于Number()函数在转换字符串时比较复杂而且不够合理，因此在处理整数的时候更常用的parseInt()函数。parseInt()函数在转换字符串时，更多的是看其是否符合数值模式。它会忽略字符串前面的空格，直至找到第一个非空格字符。如果第一个字符串不是数字字符或者负号，parseInt()会返回NaN；也就是说，用parseInt()转换空字符串会返回NaN。如果第一个字符是数字字符，praseInt()会继续解析第二个字符，知道解析完所有后续字符或者遇到了一个非数字字符。例如，"1234blue"会被转换为1234，”22.5“会被转换为22，因为小数点并不是有效的数字字符。</p>
+
+<p>如果字符串中的第一个字符是数字字符，parseInt()也能够识别出各种整数格式（即十进制、八进制、十六进制）</p>
+
+<pre><code>var num1 = parseInt("1234blue");    //1234
+var num2 = parseInt("");            //NaN
+var num3 = parseInt("0xA");            //10（十六进制）
+var num4 = parseInt("22.5");        //22
+var num5 = parseInt("070");            //56（八进制）
+var num6 = parseInt("70");            //70
+
+var num7 = parseInt("10",2);        //2（按二进制解析）
+var num8 = parseInt("10",8);        //8(按八进制解析)
+var num9 = parseInt("10",10);        //10（按十进制解析）
+var num10 = parseInt("10",16);        //16（按十六进制解析）
+var num11 = parseInt("70",8);            //56（按八进制）
+var num12 = parseInt("AF",16);        //175（按十六进制解析）
+</code></pre>
+
+<p>与parseInt()函数类似，parseFloat()也是从第一个字符（位置0）开始解析每个字符。而且也是一直解析到字符串末尾，或者解析到遇见一个无效的浮点数字字符为止。也就是说，字符串中的第一个小数点是有效的，而第二个小数点就是无效的了，因此它后面的字符串将被忽略。例如，”22.34.5“将会被转换成22.34。</p>
+
+<p>parseFloat()和parseInt()的第二个区别在于它始终都会忽略前导的零。所以parseFloat()只能解析十进制值，它没有用第二个参数指定基数的用法。</p>
+
+<pre><code>var num1 = parseFloat("1234blue");    //1234
+var num2 = parseFloat("0xA");        //0
+var num3 = parseFloat("22.5");        //22.5
+var num4 = parseFloat("22.34.5");    //22.34
+var num5 = parseFloat("0908.5");    //908.5
+</code></pre>
+
+<h3>String类型</h3>
+
+<p>String类型用于表示由零或多个16位Unicode字符组成的字符序列，即字符串。字符串可以由单引号('')或双引号("")表示。
+　</p>
+
+<p>toString()方法：</p>
+
+<p>数值、布尔值、对象和字符串值都有toString()方法。但null和undefined值没有这个方法。</p>
+
+<p>toString()方法可以指定基数，返回指定进制的字符串</p>
+
+<pre><code>var num = 10;
+alert(num.toString());      //"10"
+alert(num.toString(2));     //"1010"
+alert(num.toString(8));     //"12"
+alert(num.toString(10));    //"10"
+alert(num.toString(16));    //"a"
+</code></pre>
+
+<p>在不知道要转换的值是不是null或undefined的情况下，还可以使用转型函数String()，这个函数能够将任何类型的值转换为字符串。String()函数遵循下列转换规则：</p>
+
+<ul>
+<li>如果值有toString()方法，则调用该方法（没有参数）并返回相应的结果</li>
+<li>如果值是null，则返回"null"</li>
+<li>如果值是undefined，则返回”undefined“</li>
+</ul>
+
+
+<h3>Object类型</h3>
+
+<p>对象其实就是一组数据和功能的集合。对象可以通过执行new操作符后跟要创建的对象类型的名称或直接指定{}来创建。而创建Object类型的实例并为其添加属性和（或）方法，就可以创建自定义对象</p>
+
+<pre><code>var o = new Object();
+var oo = {};
+</code></pre>
+
+<p>Object的每个实例都具有下列属性和方法：</p>
+
+<ul>
+<li>constructor——保存着用于创建当前对象的函数</li>
+<li>hasOwnProperty(propertyName)——用于检查给定的属性在当前对象实例中（而不是在实例的原型中）是否存在。其中，作为参数的属性名(propertyName)必须以字符串形式指定（例如：o.hasOwnProperty("name")）</li>
+<li>isPrototypeOf(object)——用于检查传入的对象是否是一个对象的原型</li>
+<li>propertyIsEnumerable(propertyName)——用于检查给定的属性是否能够使用for-in语句来枚举</li>
+<li>toString()——返回对象的字符串表示</li>
+<li>valueOf()——返回对象的字符串、数值或布尔值表示。通常与toString()方法的返回值相同。</li>
+</ul>
+
+]]></content:encoded>
+      <dc:date>2015-05-12T20:16:33+00:00</dc:date>
+    </item>
+    <item>
+      <title>javaScript继承</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/07/javaScript%E7%BB%A7%E6%89%BF.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Thu, 07 May 2015 08:16:33 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/07/javaScript%E7%BB%A7%E6%89%BF.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<h3>一、new prototype 实例化对象 原型链</h3>
+
+<p>所有实例对象需要共享的属性和方法，都放在prototype对象对象里面；那些不需要共享的本地属性和方法，就放在构造函数里面。</p>
+
+<p>实例对象一旦创建，将自动引用prototype对象的属性和方法。也就是说，实例对象的属性和方法，分成两种，一种是本地的，另一种是引用的</p>
+
+<p>实例：姓名和年龄是私有的 而性别是共享的 实例化对象的性别总是一样</p>
+
+<p>注意：prototype是可以重写</p>
+
+<pre><code>function People( name, age ) {
+    this.name = name;
+    this.age = age;
+}
+People.prototype = {
+    sex:"male"
+};
+People.prototype.sex="female";
+var people1 = new People( "zodiac", "20" ),
+        people2 = new People( "xl", "21" );
+</code></pre>
+
+<h3>二、apply call 对象冒充实现继承 只能继承构造函数 不能继承原型prototype</h3>
+
+<pre><code>function People( name, age ) {
+    this.name = name;
+    this.age = age;
+}
+People.prototype = {
+    sayName : function () {
+        alert( this.name );
+    }
+};
+
+function Dog( name, age ) {
+
+    this.constructor = People;
+    this.constructor( name+"狗", age);
+    delete this.constructor;
+
+    People.apply( this, [name+"狗", age] );
+    People.call(this, name+"狗",age);
+}
+
+var dog = new Dog( "单身", "22" );
+
+ alert(dog.name);//单身狗
+dog.sayName();//error
+
+//下面3种方法一样
+this.constructor = People;
+this.constructor( name, age);
+delete this.constructor;
+
+People.apply( this, [name, age] );
+
+People.call(this, name,age);
+</code></pre>
+
+<h3>三、原型链继承</h3>
+
+<p>原型方式将<strong>继承者Dog</strong>的<strong>prototype</strong>属性设置成<strong>被继承者People</strong>的实例。</p>
+
+<p>因为想要获得People的所有属性和方法（不包括构造函数）将People的实例赋予Dog的prototype属性是最好的方法了</p>
+
+<pre><code>function People(age) {
+   this.age=age;
+}
+
+People.prototype.name = "zodiac";
+People.prototype.sayName = function () {
+    alert(this.name);
+};
+People.prototype.sayAge = function () {
+    alert(this.age);
+};
+
+function Dog() {
+
+}
+
+Dog.prototype = new People();
+var dog=new Dog();
+dog.sayName();// zodiac
+dog.sayAge();// undefined
+</code></pre>
+
+<p>instanceof 可以判断一个实例是否属于某种类型 在继承关系中用来判断一个实例是否属于它的父类型</p>
+
+<p>在原型链中 对于继承者Dog的所有实例，instanceof 为 People 和 Dog 都返回 true</p>
+
+<pre><code>alert(dog instanceof Dog);  //输出 "true"
+alert(dog instanceof People);   //输出 "true"
+</code></pre>
+
+<h3>四、混合方式</h3>
+
+<ul>
+<li><p>apply call对象冒充</p>
+
+<p>  优点：可以继承构造函数 构造函数可以带参数
+  缺点：不能继承原型</p></li>
+<li><p>原型链继承</p>
+
+<p>  优点：可以继承原型
+  缺点：不可以继承构造函数</p></li>
+</ul>
+
+
+<p>为了即能构造函数带参数又能继承原型我们可以混合使用</p>
+
+<ul>
+<li>用对象冒充继承构造函数的属性</li>
+<li><p>用原型链继承 prototype 对象的方法</p>
+
+<p>  function People( name, age ) {
+      this.name = name;
+      this.age = age;
+  }
+  People.prototype = {
+      sayName : function () {
+          alert( this.name );
+      }
+  };
+  function Dog( name, age ) {
+      People.call(this, name+"狗",age);
+  }</p>
+
+<p>  Dog.prototype = new People();
+  var dog=new Dog("单身","22");
+  dog.sayName();//单身狗</p></li>
+</ul>
+
+]]></content:encoded>
+      <dc:date>2015-05-07T08:16:33+00:00</dc:date>
+    </item>
+    <item>
+      <title>meta标签详解</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/04/meta%E6%A0%87%E7%AD%BE%E8%AF%A6%E8%A7%A3.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Mon, 04 May 2015 20:08:26 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/04/meta%E6%A0%87%E7%AD%BE%E8%AF%A6%E8%A7%A3.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<h3>一、定义语言</h3>
+
+<pre><code> &lt;meta charset="utf-8"/&gt;
+</code></pre>
+
+<p>规定 HTML 文档的字符编码 ；常用的有UTF8是国际编码 GBK是中文编码等；
+如果网页出现乱码，可以检查网页输出编码、网页文件保存编码、数据库整理编码是否一致</p>
+
+<h3>二、name属性</h3>
+
+<p>name属性主要用于描述网页，与之对应的属性值为content，content中的内容主要是便于搜索引擎机器人查找信息和分类信息用的。</p>
+
+<p>meta标签的name属性语法格式是：</p>
+
+<pre><code>&lt;meta name="参数" content="具体的参数值"&gt;
+</code></pre>
+
+<p>name属性主要参数：</p>
+
+<ol>
+<li><p>Keywords 告诉搜索引擎你网页的关键字是什么</p>
+
+<pre><code> &lt;meta name ="keywords" content="science,education,culture,politics,ecnomics,relationships,entertainment,human"&gt;
+</code></pre></li>
+<li><p>description 告诉搜索引擎你的网站主要内容</p>
+
+<pre><code> &lt;meta name="description" content="This page is about the meaning of science,education,culture."&gt;
+</code></pre></li>
+<li><p>robots 机器人向导告诉搜索机器人哪些页面需要索引，哪些页面不需要索引 content的参数有all,none,index,noindex,follow,nofollow。默认是all。</p>
+
+<pre><code> &lt;meta name="robots" content="none"&gt;
+</code></pre></li>
+<li><p>all：文件将被检索，且页面上的链接可以被查询；</p></li>
+<li><p>none：文件将不被检索，且页面上的链接不可以被查询；</p></li>
+<li><p>index：文件将被检索；（让robot/spider登录）</p></li>
+<li><p>follow：页面上的链接可以被查询；</p></li>
+<li><p>noindex：文件将不被检索，但页面上的链接可以被查询；(不让robot/spider登录)</p></li>
+<li><p>nofollow：文件将不被检索，页面上的链接可以被查询。(不让robot/spider顺着此页的连接往下探找)</p></li>
+<li><p>author标注网页的作者</p></li>
+<li>Copyright (版权)</li>
+<li><p>revisit-after(重访)</p>
+
+<pre><code> &lt;META name="revisit-after" CONTENT="7 days" &gt;
+</code></pre></li>
+</ol>
+
+
+<h3>三、http-equiv属性</h3>
+
+<p>http-equiv顾名思义，相当于http的文件头作用，它可以向浏览器传回一些有用的信息，以帮助正确和精确地显示网页内容，与之对应的属性值为content，content中的内容其实就是各个参数的变量值。</p>
+
+<p>meta标签的http-equiv属性语法格式是：</p>
+
+<pre><code>    &lt;meta http-equiv="参数" content="参数变量值"&gt;
+</code></pre>
+
+<p>http-equiv属性主要参数：</p>
+
+<ol>
+<li><p>Expires 设定网页的到期时间。一旦网页过期，必须重新请求服务器。（时间必须使用<strong><em>GMT时间格式</em></strong>）</p>
+
+<pre><code> &lt;meta http-equiv="expires" content="Fri,12 Jan 2001 18:18:18 GMT"&gt;
+</code></pre></li>
+<li><p>Pragma(cache模式）浏览器默认缓存页面 设置后禁止浏览器从本地计算机的缓存中访问页面内容（无法<strong><em>脱机浏览</em></strong>）</p>
+
+<pre><code> &lt;meta http-equiv="Pragma" content="no-cache"&gt;
+</code></pre></li>
+<li><p>Refresh 自动刷新并转到新页面 停留content秒钟后自动刷新到URL网址 URL可为空</p>
+
+<pre><code> &lt;meta http-equiv="Refresh" content="2;URL"&gt;
+</code></pre></li>
+<li><p>Set-Cookie(cookie设定）一般存放小数据 如果网页过期，那么存盘的cookie将被删除（时间必须使用<strong><em>GMT时间格式</em></strong>）</p>
+
+<pre><code> &lt;meta http-equiv="Set-Cookie" content="cookievalue=xxx; expires=Friday,12-Jan-2001 18:18:18 GMT; path=/"&gt;
+</code></pre></li>
+<li><p>Window-target 显示窗口的设定 这个属性是用来防止别人在框架里调用你的页面。Content选项：<em>blank、</em>top、<em>self、</em>parent。</p>
+
+<pre><code> &lt;Meta http-equiv=Widow-target Content=_top&gt;
+</code></pre></li>
+</ol>
+
+
+<h3>四、动画效果（IE）</h3>
+
+<p>使用meta标签，我们还可以在进入网页或者离开网页的一刹那实现动画效果 （所加网页不能是一个Frame页）</p>
+
+<pre><code>    &lt;meta http-equiv="Page-Enter" content="revealTrans(duration=5.0,transition=20)"&gt;
+</code></pre>
+
+<p>Duration表示滤镜特效的持续时间（单位：秒）</p>
+
+<p>Transition滤镜类型。表示使用哪种特效，取值为0-23:</p>
+
+<ul>
+<li><p>Page-Enter : 进入页面</p></li>
+<li><p>Page-Exit  : 离开页面</p></li>
+<li><p>Site-Enter : 进入网站</p></li>
+<li><p>Site-Exit  : 离开网站</p></li>
+<li><p>0矩形缩小</p></li>
+<li>1矩形扩大</li>
+<li>2 圆形缩小</li>
+<li>3 圆形扩大</li>
+<li>4 下到上刷新</li>
+<li>5 上到下刷新</li>
+<li>6 左到右刷新</li>
+<li>7 右到左刷新</li>
+<li>8 竖百叶窗</li>
+<li>9 横百叶窗</li>
+<li>10 错位横百叶窗</li>
+<li>11 错位竖百叶窗</li>
+<li>12 点扩散</li>
+<li>13 左右到中间刷新</li>
+<li>14 中间到左右刷新</li>
+<li>15 中间到上下</li>
+<li>16 上下到中间</li>
+<li>17 右下到左上</li>
+<li>18 右上到左下</li>
+<li>19 左上到右下</li>
+<li>20 左下到右上</li>
+<li>21 横条</li>
+<li>22 竖条</li>
+<li>23 以上22种随机选择一种</li>
+</ul>
+
+
+<h3>五、其他用法</h3>
+
+<ol>
+<li><p>Link (链接) 很多网站如果你把她保存在收件夹中后，会发现它连带着一个小图标，如果再次点击进入之后还会发现地址栏中也有个小图标。现在只要在你的页头加上这段话，就能轻松实现这一功能。</p>
+
+<pre><code> &lt;Link href="soim.ico" rel="Shortcut Icon"&gt;
+</code></pre></li>
+<li><p>Base (基链接) 插入网页基链接属性
+网页上的所有相对路径在链接时都将在前面加上“http://www.***.com/”。其中target=<em>blank是链接文件在新 的窗口中打开，你可以做其他设置。将“</em>blank”改为“<em>parent”是链接文件将在当前窗口的父级窗口中打开；改为“</em>self”链接文件在当前 窗口（帧）中打开；改为“_top”链接文件全屏显示</p>
+
+<pre><code>  &lt;Base href=http://www.***.net/ target=_blank&gt;
+</code></pre></li>
+</ol>
+
+]]></content:encoded>
+      <dc:date>2015-05-04T20:08:26+00:00</dc:date>
+    </item>
+    <item>
+      <title>常用CSS优化总结——网络性能与语法性能建议</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/03/%E5%B8%B8%E7%94%A8CSS%E4%BC%98%E5%8C%96%E6%80%BB%E7%BB%93%E2%80%94%E2%80%94%E7%BD%91%E7%BB%9C%E6%80%A7%E8%83%BD%E4%B8%8E%E8%AF%AD%E6%B3%95%E6%80%A7%E8%83%BD%E5%BB%BA%E8%AE%AE.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Sun, 03 May 2015 10:11:45 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/03/%E5%B8%B8%E7%94%A8CSS%E4%BC%98%E5%8C%96%E6%80%BB%E7%BB%93%E2%80%94%E2%80%94%E7%BD%91%E7%BB%9C%E6%80%A7%E8%83%BD%E4%B8%8E%E8%AF%AD%E6%B3%95%E6%80%A7%E8%83%BD%E5%BB%BA%E8%AE%AE.html</guid>
       <content:encoded><![CDATA[<!--more-->
 
 
@@ -32,16 +1766,16 @@
 
 <p>就是把我们CSS中没用的空白符等删去，达到缩减字符个数的目的</p>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">.</span><span class="n">test</span><span class="p">{</span>
-    <span class="n">background</span><span class="o">-</span><span class="ss">color</span><span class="p">:</span><span class="c1">#ffffff;</span>
-    <span class="n">background</span><span class="o">-</span><span class="ss">image</span><span class="p">:</span><span class="n">url</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">jpg</span><span class="p">);</span>
-<span class="p">}</span></code></pre></div>
-
+<pre><code>.test{
+    background-color:#ffffff;
+    background-image:url(a.jpg);
+}
+</code></pre>
 
 <p>经过压缩后会变成这样：</p>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">.</span><span class="n">test</span><span class="p">{</span> <span class="n">background</span><span class="o">-</span><span class="ss">color</span><span class="p">:</span><span class="c1">#fff;  background-image:url(a.jpg)}</span></code></pre></div>
-
+<pre><code>.test{ background-color:#fff;  background-image:url(a.jpg)}
+</code></pre>
 
 <h3>二、gzip压缩</h3>
 
@@ -98,15 +1832,15 @@ gzip压缩需要服务器的支持，所以我们需要在服务器端进行配�
 <p>尽量使用最具体的类别、避免后代选择器、属于标签类别的规则永远不要包含子选择器
 这三条规则是想通的，因为从左到右解析关系，在CSS选择器中后代选择器非但没有帮我们加快CSS查找，反而后代选择器是 CSS 中耗费最昂贵的选择器。 它的耗费是极其昂贵的—特别是当选择器在标签或通用类别中，建议是当使用子选择器时要十分谨慎，能免则免。对此我们可以通过具体类别——使用单一或尽量少的class解决。</p>
 ]]></content:encoded>
-      <dc:date>2015-04-25T14:23:45+00:00</dc:date>
+      <dc:date>2015-05-03T10:11:45+00:00</dc:date>
     </item>
     <item>
       <title>容易被忽略的css特性</title>
-      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/04/25/%E5%AE%B9%E6%98%93%E8%A2%AB%E5%BF%BD%E7%95%A5%E7%9A%84css%E7%89%B9%E6%80%A7.html</link>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/03/%E5%AE%B9%E6%98%93%E8%A2%AB%E5%BF%BD%E7%95%A5%E7%9A%84css%E7%89%B9%E6%80%A7.html</link>
       <description><![CDATA[
 ]]></description>
-      <pubDate>Sat, 25 Apr 2015 14:23:45 +0000</pubDate>
-      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/04/25/%E5%AE%B9%E6%98%93%E8%A2%AB%E5%BF%BD%E7%95%A5%E7%9A%84css%E7%89%B9%E6%80%A7.html</guid>
+      <pubDate>Sun, 03 May 2015 09:23:33 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/05/03/%E5%AE%B9%E6%98%93%E8%A2%AB%E5%BF%BD%E7%95%A5%E7%9A%84css%E7%89%B9%E6%80%A7.html</guid>
       <content:encoded><![CDATA[<!--more-->
 
 
@@ -138,7 +1872,7 @@ gzip压缩需要服务器的支持，所以我们需要在服务器端进行配�
 </ul>
 
 ]]></content:encoded>
-      <dc:date>2015-04-25T14:23:45+00:00</dc:date>
+      <dc:date>2015-05-03T09:23:33+00:00</dc:date>
     </item>
     <item>
       <title>css规范</title>
@@ -209,51 +1943,51 @@ gzip压缩需要服务器的支持，所以我们需要在服务器端进行配�
 
 <h4>1、文件顶部注释</h4>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1</span> <span class="sr">/*</span>
-<span class="lineno">2</span> <span class="sr">* @description: 中文说明</span>
-<span class="lineno">3</span> <span class="sr">* @author: name</span>
-<span class="lineno">4</span> <span class="sr">* @update: name (2013-04-13 18:32)</span>
-<span class="lineno">5</span> <span class="sr">*/</span></code></pre></div>
-
+<pre><code>/*
+* @description: 中文说明
+* @author: name
+* @update: name (2013-04-13 18:32)
+*/
+</code></pre>
 
 <h4>2、模块注释（模块注释必须单独一行）</h4>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1</span> <span class="sr">/* module: module1 by zodiac */</span>
-<span class="lineno">2</span> <span class="err">…</span>
-<span class="lineno">3</span> <span class="sr">/* module: module2 by zodiac */</span></code></pre></div>
-
+<pre><code>/* module: module1 by zodiac */
+…
+/* module: module2 by zodiac */
+</code></pre>
 
 <h4>3、单行注释和多行注释</h4>
 
 <p>单行注释可以的单独一行，也可以写在行尾，单行注释最多不超过40个汉字或80个英文字符</p>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sr">/* this is a short comment */</span></code></pre></div>
-
+<pre><code>/* this is a short comment */
+</code></pre>
 
 <p>多行注释必须写在单独行</p>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sr">/*</span>
-<span class="sr">* this is comment line 1.</span>
-<span class="sr">* this is comment line 2.</span>
-<span class="sr">*/</span></code></pre></div>
-
+<pre><code>/*
+* this is comment line 1.
+* this is comment line 2.
+*/
+</code></pre>
 
 <h4>4、特殊注释</h4>
 
 <p>用于标注待办、修改信息</p>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sr">/* TODO: xxxx by name 2013-04-13 18:32 */</span>
-<span class="sr">/* BUGFIX: xxxx by name 2012-04-13 18:32 */</span></code></pre></div>
-
+<pre><code>/* TODO: xxxx by name 2013-04-13 18:32 */
+/* BUGFIX: xxxx by name 2012-04-13 18:32 */
+</code></pre>
 
 <h4>5、区域注释</h4>
 
 <p>对于代码区块注释，将样式语句分区块</p>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sr">/* Header */</span>
-<span class="sr">/* Footer */</span>
-<span class="sr">/* Gallery */</span></code></pre></div>
-
+<pre><code>/* Header */
+/* Footer */
+/* Gallery */
+</code></pre>
 
 <h3>三、命名规范</h3>
 
@@ -364,6 +2098,15 @@ gzip压缩需要服务器的支持，所以我们需要在服务器端进行配�
 <p>不轻易使用浏览器检测和CSS Hacks，考虑到代码高效率和易管理，虽然这两种方法能快速解决浏览器解析差异，但会降低代码效率且不易管理。
 推荐使用下面的：</p>
 
+<ul>
+<li>IE都能识别*，其他浏览器均不支持</li>
+<li>IE6支持下划线"_"，其他浏览器均不支持</li>
+<li>IE6能识别*，但不能识别 !important </li>
+<li>IE7能识别*，也能识别!important </li>
+<li>FF不能识别*，但能识别!important </li>
+</ul>
+
+
 <p>区别属性：</p>
 
 <table>
@@ -444,6 +2187,20 @@ gzip压缩需要服务器的支持，所以我们需要在服务器端进行配�
 ]]></content:encoded>
       <dc:date>2015-04-25T14:23:45+00:00</dc:date>
     </item>
-    <dc:date>2015-04-25T14:23:45+00:00</dc:date>
+    <item>
+      <title>chrome调试总结</title>
+      <link>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/04/25/chrome%E8%B0%83%E8%AF%95%E6%80%BB%E7%BB%93.html</link>
+      <description><![CDATA[
+]]></description>
+      <pubDate>Sat, 25 Apr 2015 14:23:45 +0000</pubDate>
+      <guid>http://zodiac-xl.github.io/%E6%96%87%E6%A1%A3/2015/04/25/chrome%E8%B0%83%E8%AF%95%E6%80%BB%E7%BB%93.html</guid>
+      <content:encoded><![CDATA[<!--more-->
+
+
+<p><img src="/blog/lib/img/xr.png" alt="MacDown logo" /></p>
+]]></content:encoded>
+      <dc:date>2015-04-25T14:23:45+00:00</dc:date>
+    </item>
+    <dc:date>2015-05-22T18:32:25+00:00</dc:date>
   </channel>
 </rss>

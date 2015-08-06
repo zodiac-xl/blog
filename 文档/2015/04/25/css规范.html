@@ -2,17 +2,79 @@
 <html>
 
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Page-Exit" Content="revealTrans(duration=3, transition=23)">
+    <title>css规范</title>
+    <meta name="description"
+          content="文件规范 注释规范 命名规范 书写规范">
 
-  <title>css规范</title>
-  <meta name="description" content="文件规范 注释规范 命名规范 书写规范">
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/7.1/styles/default.min.css">
 
-  <link rel="stylesheet" href="/blog/css/main.css">
-  <link rel="canonical" href="http://zodiac-xl.github.io/blog/%E6%96%87%E6%A1%A3/2015/04/25/css%E8%A7%84%E8%8C%83.html">
-  <link rel="alternate" type="application/rss+xml" title="zodiac's blog" href="http://zodiac-xl.github.io/blog/rss.xml" />
-  <link href="http://zodiac-xl.github.io/blog/rss.xml" type="application/atom+xml" rel="alternate" title="zodiac's blog">
+    <script src="/blog/js/jquery-2.1.4.js"></script>
+
+    <script src="http://yandex.st/highlightjs/7.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" href="/blog/css/main.css">
+    <link rel="canonical" href="http://zodiac-xl.github.io/blog/%E6%96%87%E6%A1%A3/2015/04/25/css%E8%A7%84%E8%8C%83.html">
+    <link rel="alternate" type="application/rss+xml" title="zodiac's blog"
+          href="http://zodiac-xl.github.io/blog/rss.xml"/>
+    <link href="http://zodiac-xl.github.io/blog/rss.xml" type="application/atom+xml"
+          rel="alternate" title="zodiac's blog">
+    <link rel="shortcut icon" href="/blog/lib/img/xr.png"/>
+
+
+    <style>
+
+
+        .cdata, .comment, .doctype, .prolog {
+            color: #708090
+        }
+
+        .punctuation {
+            color: #999
+        }
+
+        .namespace {
+            opacity: .7
+        }
+
+        .boolean, .constant, .number, .property, .symbol, .tag {
+            color: #905
+        }
+
+        .attribute, .attr-name, .builtin, .selector, .string {
+            color: #690
+        }
+
+        .atrule, .attr-value, .keyword {
+            color: #07a
+        }
+
+        .function {
+            color: #DD4A68
+        }
+
+        .important, .regex {
+            color: #e90
+        }
+
+        .important {
+            font-weight: 700
+        }
+
+        .entity {
+            cursor: help
+        }
+
+        .key {
+            color: #960
+        }
+
+
+    </style>
 </head>
 
 
@@ -46,6 +108,18 @@
           
         
           
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
           <a class="page-link" href="/blog/categories/%E6%96%87%E6%A1%A3/index.html">文档</a>
           
         
@@ -67,8 +141,13 @@
     <h1 class="post-title">css规范</h1>
     <p class="post-meta">Apr 25, 2015</p>
   </header>
+  <div class="column-strip wiki-column" id="wiki-right">
+    <!-- table of contents -->
+    <div id="toc" class="toc toggleable">
+      <a href="#toc" class="title toggler" data-open-icon="icon-plus" data-closed-icon="icon-minus" aria-haspopup="true">在本文章中<i class="icon-minus"></i></a>
+    </div>
+  </div>
   <article class="post-content">
-    <p><span class="number">472</span> words will take about <span class="number">2</span> minutes to read</p>
     <p>文件规范 注释规范 命名规范 书写规范</p>
 
 <!--more-->
@@ -131,51 +210,51 @@
 
 <h4>1、文件顶部注释</h4>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1</span> <span class="sr">/*</span>
-<span class="lineno">2</span> <span class="sr">* @description: 中文说明</span>
-<span class="lineno">3</span> <span class="sr">* @author: name</span>
-<span class="lineno">4</span> <span class="sr">* @update: name (2013-04-13 18:32)</span>
-<span class="lineno">5</span> <span class="sr">*/</span></code></pre></div>
-
+<pre><code>/*
+* @description: 中文说明
+* @author: name
+* @update: name (2013-04-13 18:32)
+*/
+</code></pre>
 
 <h4>2、模块注释（模块注释必须单独一行）</h4>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="lineno">1</span> <span class="sr">/* module: module1 by zodiac */</span>
-<span class="lineno">2</span> <span class="err">…</span>
-<span class="lineno">3</span> <span class="sr">/* module: module2 by zodiac */</span></code></pre></div>
-
+<pre><code>/* module: module1 by zodiac */
+…
+/* module: module2 by zodiac */
+</code></pre>
 
 <h4>3、单行注释和多行注释</h4>
 
 <p>单行注释可以的单独一行，也可以写在行尾，单行注释最多不超过40个汉字或80个英文字符</p>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sr">/* this is a short comment */</span></code></pre></div>
-
+<pre><code>/* this is a short comment */
+</code></pre>
 
 <p>多行注释必须写在单独行</p>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sr">/*</span>
-<span class="sr">* this is comment line 1.</span>
-<span class="sr">* this is comment line 2.</span>
-<span class="sr">*/</span></code></pre></div>
-
+<pre><code>/*
+* this is comment line 1.
+* this is comment line 2.
+*/
+</code></pre>
 
 <h4>4、特殊注释</h4>
 
 <p>用于标注待办、修改信息</p>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sr">/* TODO: xxxx by name 2013-04-13 18:32 */</span>
-<span class="sr">/* BUGFIX: xxxx by name 2012-04-13 18:32 */</span></code></pre></div>
-
+<pre><code>/* TODO: xxxx by name 2013-04-13 18:32 */
+/* BUGFIX: xxxx by name 2012-04-13 18:32 */
+</code></pre>
 
 <h4>5、区域注释</h4>
 
 <p>对于代码区块注释，将样式语句分区块</p>
 
-<div class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sr">/* Header */</span>
-<span class="sr">/* Footer */</span>
-<span class="sr">/* Gallery */</span></code></pre></div>
-
+<pre><code>/* Header */
+/* Footer */
+/* Gallery */
+</code></pre>
 
 <h3>三、命名规范</h3>
 
@@ -286,6 +365,15 @@
 <p>不轻易使用浏览器检测和CSS Hacks，考虑到代码高效率和易管理，虽然这两种方法能快速解决浏览器解析差异，但会降低代码效率且不易管理。
 推荐使用下面的：</p>
 
+<ul>
+<li>IE都能识别*，其他浏览器均不支持</li>
+<li>IE6支持下划线"_"，其他浏览器均不支持</li>
+<li>IE6能识别*，但不能识别 !important </li>
+<li>IE7能识别*，也能识别!important </li>
+<li>FF不能识别*，但能识别!important </li>
+</ul>
+
+
 <p>区别属性：</p>
 
 <table>
@@ -365,11 +453,12 @@
 
 
   </article>
-
   <nav>
     
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/04/25/chrome%E8%B0%83%E8%AF%95%E6%80%BB%E7%BB%93.html" title="chrome调试总结">&larr; Previous Post</a>
     
-    <a href="/blog/%E6%96%87%E6%A1%A3/2015/04/25/%E5%AE%B9%E6%98%93%E8%A2%AB%E5%BF%BD%E7%95%A5%E7%9A%84css%E7%89%B9%E6%80%A7.html" title="容易被忽略的css特性">Next Post &rarr;</a>
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/03/%E5%AE%B9%E6%98%93%E8%A2%AB%E5%BF%BD%E7%95%A5%E7%9A%84css%E7%89%B9%E6%80%A7.html" title="容易被忽略的css特性">Next Post &rarr;</a>
     
   </nav>
 
@@ -379,7 +468,7 @@
 </div>
 
 <div class="side-bar">
-  <a href="/blog/tag/css/" class="set-5">css</a>
+    <a href="/blog/tag/css/" class="set-2">css</a> <a href="/blog/tag/html/" class="set-1">html</a> <a href="/blog/tag/js/" class="set-5">js</a> <a href="/blog/tag/%E8%B0%83%E8%AF%95/" class="set-1">调试</a>
 </div>
 
 <footer class="site-footer">
@@ -444,6 +533,80 @@
 </script>
 
 
+
+<script>
+    $(function () {
+        var hData = [];
+        var h3Index,
+                h4Index,
+                h5Index,
+                h3Tree,
+                h4Tree,
+                h5Tree;
+
+        h3Index = h4Index = h5Index = 0;
+        h3Tree = h4Tree = h5Tree = hData;
+
+
+        $("h3,h4,h5").each(function (i, el) {
+            var id,
+                    parentTree = hData;
+
+            switch (this.tagName) {
+                case "H3":
+                    id = "h3-" + String(h3Index++);
+                    parentTree = h3Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    h4Tree = h3Tree[h3Tree.length - 1].subTree;
+                    break;
+                case "H4":
+                    id = "h3-" + String(h3Index) + "_h4-" + String(h4Index++);
+                    parentTree = h4Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    h5Tree = h4Tree[h4Tree.length - 1].subTree;
+                    break;
+                case "H5":
+                    id = "h3-" + String(h3Index) + "_h4-" + String(h4Index) + "_h5-" + String(h5Index++);
+                    parentTree = h5Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    break;
+                default :
+                    break;
+            }
+
+            el.id = id;
+
+        });
+
+
+        function createUl(data, parent) {
+            var $ul = $("<ul></ul>");
+            $.each(data, function (index, item) {
+                var $li = $("<li><a href='#" + item.id + "'>" + item.name + "</a></li>");
+
+                if (item.subTree && item.subTree.length != 0) {
+                    createUl(item.subTree, $li);
+                }
+                $ul.append($li);
+            });
+            parent.append($ul);
+        }
+
+        createUl(hData, $("#toc"));
+    });
+</script>
 
 
 </body>

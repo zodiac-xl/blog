@@ -6,9 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Page-Exit" Content="revealTrans(duration=3, transition=23)">
-    <title>About</title>
+    <title>离线应用和客户端存储</title>
     <meta name="description"
-          content="we are young we are strong">
+          content="">
 
     <link rel="stylesheet" href="http://yandex.st/highlightjs/7.1/styles/default.min.css">
 
@@ -18,7 +18,7 @@
     <script>hljs.initHighlightingOnLoad();</script>
 
     <link rel="stylesheet" href="/blog/css/main.css">
-    <link rel="canonical" href="http://zodiac-xl.github.io/blog/about/">
+    <link rel="canonical" href="http://zodiac-xl.github.io/blog/%E6%96%87%E6%A1%A3/2015/05/20/%E7%A6%BB%E7%BA%BF%E5%BA%94%E7%94%A8%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AD%98%E5%82%A8.html">
     <link rel="alternate" type="application/rss+xml" title="zodiac's blog"
           href="http://zodiac-xl.github.io/blog/rss.xml"/>
     <link href="http://zodiac-xl.github.io/blog/rss.xml" type="application/atom+xml"
@@ -137,17 +137,226 @@
     <div class="wrapper">
         <div class="post">
 
-    <header class="post-header">
-        <h1 class="post-title">About</h1>
-    </header>
-    <article class="post-content">
-        <p>This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at <a href="http://jekyllrb.com/">jekyllrb.com</a></p>
+  <header class="post-header">
+    <h1 class="post-title">离线应用和客户端存储</h1>
+    <p class="post-meta">May 20, 2015</p>
+  </header>
+  <div class="column-strip wiki-column" id="wiki-right">
+    <!-- table of contents -->
+    <div id="toc" class="toc toggleable">
+      <a href="#toc" class="title toggler" data-open-icon="icon-plus" data-closed-icon="icon-minus" aria-haspopup="true">在本文章中<i class="icon-minus"></i></a>
+    </div>
+  </div>
+  <article class="post-content">
+    <!--more-->
 
-<p>You can find the source code for the Jekyll new theme at: <a href="https://github.com/jglovier/jekyll-new">github.com/jglovier/jekyll-new</a></p>
 
-<p>You can find the source code for Jekyll at <a href="https://github.com/jekyll/jekyll">github.com/jekyll/jekyll</a></p>
+<h3>离线检测</h3>
 
-    </article>
+<p>判断设备是否能上网 navigator.onLine</p>
+
+<p>window事件online offline 在网络环境发生变化时触发</p>
+
+<pre><code>alert( navigator.onLine );
+
+W.addHandler( window, "online", function () {
+    alert( "online" );
+} );
+W.addHandler( window, "offline", function () {
+    alert( "offline" );
+} );
+</code></pre>
+
+<h3>应用程序缓存（Application Cache）</h3>
+
+<p>HTML5 引入了应用程序缓存，这意味着 web 应用可进行缓存，并可在没有因特网连接时进行访问</p>
+
+<p>应用程序缓存为应用带来三个优势：</p>
+
+<ul>
+<li>离线浏览 - 用户可在应用离线时使用它们</li>
+<li>速度 - 已缓存资源加载得更快</li>
+<li><p>减少服务器负载 - 浏览器将只从服务器下载更新过或更改过的资源。</p>
+
+<pre><code>  &lt;html manifest="demo.appcache"&gt;
+</code></pre></li>
+</ul>
+
+
+<blockquote><p>指定manifest文件</p>
+
+<p>manifest 文件的建议的文件扩展名是：".appcache"。
+manifest 文件需要配置正确的 MIME-type，即 "text/cache-manifest"。必须在 web 服务器上进行配置。</p></blockquote>
+
+<p>manifest 文件可分为三个部分：</p>
+
+<ul>
+<li>CACHE MANIFEST - 在此标题下列出的文件将在首次下载后进行缓存</li>
+<li>NETWORK - 在此标题下列出的文件需要与服务器的连接，且不会被缓存</li>
+<li>FALLBACK - 在此标题下列出的文件规定当页面无法访问时的回退页面（比如 404 页面)</li>
+</ul>
+
+
+<p>更新缓存
+一旦应用被缓存，它就会保持缓存直到发生下列情况：</p>
+
+<ol>
+<li>用户清空浏览器缓存</li>
+<li>manifest 文件被修改</li>
+<li>由程序来更新应用缓存</li>
+</ol>
+
+
+<p>实例 - 完整的 Manifest 文件</p>
+
+<pre><code>CACHE MANIFEST
+# 2012-02-21 v1.0.0
+/theme.css
+/logo.gif
+/main.js
+
+NETWORK:
+login.asp
+
+FALLBACK:
+/html5/ /404.html
+</code></pre>
+
+<blockquote><p>以 "#" 开头的是注释行，但也可满足其他用途。应用的缓存会在其 manifest 文件更改时被更新。如果您编辑了一幅图片，或者修改了一个 JavaScript 函数，这些改变都不会被重新缓存。更新注释行中的日期和版本号是一种使浏览器重新缓存文件的办法</p></blockquote>
+
+<h3>数据存储</h3>
+
+<h4>HTTP cookie</h4>
+
+<p>该标准要求服务器对任意HTTP请求发送Set-Cookie HTTP头作为相应的一部分，其中包括会话信息</p>
+
+<ol>
+<li><p>限制</p>
+
+<ul>
+<li>cookie在性质上是绑定在特定的域名下的。</li>
+<li>当设定了一个cookie后，再给创建它的域名发送请求时，request header会包含所有cookie。</li>
+<li>这个限制确保了存储在cookie中的信息只能让批准的接受者访问，而无法被其他域访问</li>
+<li>cookie在客户端计算机大小和数量都有限制 根据浏览器不同单个域下最多20-50个 整个cookie长度限制在2095b</li>
+</ul>
+</li>
+<li><p>cookie的构成  只有名值对儿才会被发送到服务器 其他参数都是服务器给浏览器的指示</p>
+
+<ul>
+<li>名称name  需要经过URL编码</li>
+<li>值value</li>
+<li>域domain</li>
+<li>路径path</li>
+<li>失效时间expires</li>
+<li>安全标志secure</li>
+</ul>
+
+
+<blockquote><p>设置了secure标志的cookie只能通过SSL加密连接才能传输</p></blockquote></li>
+<li><p>在请求头中设置cookie</p>
+
+<pre><code> Content-type:text/html
+ Set-Cookie:name-value;expires=Mon,22-Jan-07 07:10:24 GMT;domain=.wrox.com;path=/;secure
+ Other-header:other-header-value
+ xhr.setRequestHeader( key, value )
+</code></pre></li>
+<li><p>JavaScript中的cookie</p>
+
+<pre><code>    //返回所有cookie字符串 ;分割
+    consile.log(document.cookie);//"a=b;c=d"
+
+    //并不会覆盖原来的cookie 除非名称已经存在
+    document.cookie="key=value";
+</code></pre></li>
+<li><p>子cookie</p>
+
+<p> 为了绕开浏览器对单域名下的cookie的限制，使用子cookie</p>
+
+<pre><code> key=subKey1=subValue1&amp;subKey2=subValue2;
+</code></pre>
+
+<blockquote><p>基本原理是在value中包含子cookie</p>
+
+<p>虽然扰过了cookie数量限制却增加了cookie的长度</p></blockquote></li>
+</ol>
+
+
+<h4>Web存储机制</h4>
+
+<h5>Storage类型</h5>
+
+<p>HTML5 Storage类型都有公共方法setItem getItem removeItem  key的大小限制根据浏览器2.5M--5M</p>
+
+<ol>
+<li><p>sessionStorage保持到会话结束，即保存到浏览器关闭 合适会话类的小段数据</p>
+
+<pre><code> //使用方法存储数据
+ sessionStorage.setItem( "name", "zodiac" );
+
+ //使用属性存储数据
+ sessionStorage.age = "22";
+
+ //使用方法获取数据
+ var name = sessionStorage.getItem( "name" );
+
+ //使用属性获取数据
+ var age = sessionStorage.age;
+
+ //删除值 使用delete删除一个值 在Webkit中无效
+ sessionStorage.removeItem("name");
+ delete sessionStorage.age
+
+ //逆序获取指定位置上的名字
+ W.log( sessionStorage.key( 0 ) );
+</code></pre></li>
+<li><p>localStorage HTML5标准 老版本使用globalStorage 跨会话第存储数据，但有特定的访问限制</p>
+
+<ul>
+<li>globalStorage需要指定那些域可以访问该数据</li>
+<li>要访问localStorage,页面必须来自同一域名(子域名无效),同一协议，同一端口上。相当于globalStorage[location.host]</li>
+<li>两者的数据都保存到通过JavaScript删除或者用户清除浏览器缓存为止</li>
+</ul>
+</li>
+</ol>
+
+
+<blockquote><p>方法：和sessionStorage类似</p>
+
+<p>事件：storage 为Storage对象进行任何修改，都会在文档上触发storage事件 set get remove delete等都会触发</p></blockquote>
+
+<p> 兼容方法：</p>
+
+<pre><code>    function getLocalStorage() {
+        if ( typeof localStorage == "object" ) {
+            return localStorage;
+        }
+        else if ( typeof globalStorage == "object" ) {
+            return globalStorage[location.host];
+        }
+        else {
+            throw new Error( "Local Storage not available" );
+        }
+    }
+    var localStorage = getLocalStorage();
+</code></pre>
+
+<h5>IndexedDB</h5>
+
+<p>IndexedDB 是一个为了能够在客户端存储可观数量的结构化数据，并且在这些数据上使用索引进行高性能检索的 API。</p>
+
+<blockquote><p>虽然 DOM 存储 对于存储少量数据是非常有用的，但是它对大量结构化数据的存储就显得力不从心了。IndexedDB 则提供了这样的一个解决方案。</p>
+
+<p>IndexedDB 分别为同步和异步访问提供了单独的 API 。同步 API 本来是要用于仅供 Web Workers 内部使用，但是还没有被任何浏览器所实现。异步 API 在 Web Workers 内部和外部都可以使用。</p></blockquote>
+
+  </article>
+  <nav>
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/19/web%E9%80%9A%E4%BF%A1.html" title="web通信">&larr; Previous Post</a>
+    
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/22/JS%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7.html" title="css规范">Next Post &rarr;</a>
+    
+  </nav>
 
 </div>
 

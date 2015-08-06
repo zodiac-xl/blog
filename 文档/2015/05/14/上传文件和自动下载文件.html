@@ -6,9 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Page-Exit" Content="revealTrans(duration=3, transition=23)">
-    <title>About</title>
+    <title>上传文件和自动下载文件</title>
     <meta name="description"
-          content="we are young we are strong">
+          content="">
 
     <link rel="stylesheet" href="http://yandex.st/highlightjs/7.1/styles/default.min.css">
 
@@ -18,7 +18,7 @@
     <script>hljs.initHighlightingOnLoad();</script>
 
     <link rel="stylesheet" href="/blog/css/main.css">
-    <link rel="canonical" href="http://zodiac-xl.github.io/blog/about/">
+    <link rel="canonical" href="http://zodiac-xl.github.io/blog/%E6%96%87%E6%A1%A3/2015/05/14/%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6%E5%92%8C%E8%87%AA%E5%8A%A8%E4%B8%8B%E8%BD%BD%E6%96%87%E4%BB%B6.html">
     <link rel="alternate" type="application/rss+xml" title="zodiac's blog"
           href="http://zodiac-xl.github.io/blog/rss.xml"/>
     <link href="http://zodiac-xl.github.io/blog/rss.xml" type="application/atom+xml"
@@ -137,17 +137,126 @@
     <div class="wrapper">
         <div class="post">
 
-    <header class="post-header">
-        <h1 class="post-title">About</h1>
-    </header>
-    <article class="post-content">
-        <p>This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at <a href="http://jekyllrb.com/">jekyllrb.com</a></p>
+  <header class="post-header">
+    <h1 class="post-title">上传文件和自动下载文件</h1>
+    <p class="post-meta">May 14, 2015</p>
+  </header>
+  <div class="column-strip wiki-column" id="wiki-right">
+    <!-- table of contents -->
+    <div id="toc" class="toc toggleable">
+      <a href="#toc" class="title toggler" data-open-icon="icon-plus" data-closed-icon="icon-minus" aria-haspopup="true">在本文章中<i class="icon-minus"></i></a>
+    </div>
+  </div>
+  <article class="post-content">
+    <!--more-->
 
-<p>You can find the source code for the Jekyll new theme at: <a href="https://github.com/jglovier/jekyll-new">github.com/jglovier/jekyll-new</a></p>
 
-<p>You can find the source code for Jekyll at <a href="https://github.com/jekyll/jekyll">github.com/jekyll/jekyll</a></p>
+<h3>上传文件</h3>
 
-    </article>
+<blockquote><p>input file change事件 FileReader获取 input.files(选取的文件) 在FileReader获加载器中获取文件详细信息</p>
+
+<p>这里e.target.result就是base64编码</p></blockquote>
+
+<pre><code>$( "input" ).bind( "change", function () {
+    var reader = new FileReader(), htmlImage;
+    reader.onload = function ( e ) {
+        htmlImage = '&lt;img src="' + e.target.result + '" /&gt;';
+        $( "body" ).append( htmlImage );
+    };
+    reader.readAsDataURL( $( this ).get( 0 ).files[0] );
+} )
+</code></pre>
+
+<h3>下载文件</h3>
+
+<blockquote><p>前端很多项目中，都有文件下载的需求，特别是JS生成文件内容，然后让浏览器执行下载操作（例如在线图片编辑、在线代码编辑、iPresst等;但受限于浏览器，很多情况下我们都只能给出个链接，让用户点击打开-》另存为。</p></blockquote>
+
+<h4>方法一:a标签的download</h4>
+
+<pre><code>&lt;a href=”file.js”&gt;file.js&lt;/a&gt;
+</code></pre>
+
+<blockquote><p>用户点击这个链接的时候，浏览器会打开并显示链接指向的文件内容，显然，这并没有实现我们的需求。HTML5中给a标签增加了一个download属性，只要有这个属性，点击这个链接时浏览器就不在打开链接指向的文件，而是改为下载（目前只有chrome、firefox和opera支持）。下载时会直接使用链接的名字来作为文件名，但是是可以改的，只要给download加上想要的文件名即可(需要加上文件格式 不加默认为html)如：download=“newName.js”。</p></blockquote>
+
+<pre><code>&lt;a href=”file.js”&gt;file.js&lt;/a&gt;
+</code></pre>
+
+<h4>方法二:a标签href base64</h4>
+
+<p>但是这样还不够，以上的方法只适合用在文件是在服务器上的情况。如果在浏览器端js生成的内容，想让浏览器进行下载要如何办到呢？</p>
+
+<p>其实还是有办法办到的，相信很多人都多少听过了DataURI这个词，比较常见的就是图片的src，如：</p>
+
+<pre><code>&lt;img src=”data:image/gif;base64,R0lGOXXXXX"&gt;
+</code></pre>
+
+<p>那么，现在要将js生成的内容进行下载就有法可依了。封装成一个方法如下：</p>
+
+<p>function downloadFile(aLink, fileName, content){</p>
+
+<pre><code>aLink.download = fileName;
+aLink.href = "data:text/plain," + content;
+</code></pre>
+
+<p>}</p>
+
+<p>调用downloadFile之后，用户点击链接，就能触发浏览器下载。
+但是，还不够，上面的办法有两个硬伤：</p>
+
+<ol>
+<li>下载的文件类型限制死了</li>
+<li>下载还要再点击一下，太麻烦啦</li>
+</ol>
+
+
+<h4>方法三: URL.createObjectURL+创建点击事件自动触发</h4>
+
+<p>要解决文件类型的问题，可以用浏览器的新API（URL.createObjectURL）来解决问题</p>
+
+<blockquote><p>URL.createObjectURL通常都是用来创建图片的DataURI用来显示图片，这里用来下载文件，让浏览器来帮我们设定好文件类型。</p>
+
+<p>URL.createObjectURL的参数是File对象或者Blob对象，File对象也就是通过input[type=file]选择的文件，Blob对象是二进制大对象，详细说明可参考这里。</p>
+
+<p>现在，我们只要content数据创建一个ObjectURL并赋值给aLink即可解决文件类型的限制问题。
+文件的自动下载也挺好办，自己构建一个UI点击事件，再自动触发下，就能实现自动下载啦。</p></blockquote>
+
+<p>现在来看看选择一个文件然后使用downloadFile方法转化为base64重新下载并改名的代码：</p>
+
+<pre><code>function downloadFile(fileName, content){
+    var aLink = document.createElement('a'),
+        blob = new Blob([content]),
+        evt = document.createEvent("HTMLEvents");
+
+    evt.initEvent("click", false, false);
+    aLink.download = fileName;
+    aLink.href = URL.createObjectURL(blob);
+    aLink.dispatchEvent(evt);
+}
+
+$( "input[type='file']" ).bind( "change", function () {
+    var reader = new FileReader(), htmlImage;
+    reader.onload = function ( e ) {
+        htmlImage = '&lt;img src="' + e.target.result + '" /&gt;';
+        $( "body" ).append( htmlImage );
+        downloadFile("新文件名",e.target.result)
+    };
+    reader.readAsDataURL( $( this ).get( 0 ).files[0] );
+} )
+</code></pre>
+
+<p>现在，只要一调用downloadFile，文件就自动下载</p>
+
+<p>占坑：下载的文件是base64数据  如果怎样才能还原成可以打开的文件呢？</p>
+
+  </article>
+  <nav>
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/13/URI.html" title="URI">&larr; Previous Post</a>
+    
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/17/%E5%88%9B%E5%BB%BA%E5%92%8C%E8%A7%A6%E5%8F%91event.html" title="创建和触发event">Next Post &rarr;</a>
+    
+  </nav>
 
 </div>
 

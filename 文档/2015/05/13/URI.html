@@ -6,9 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Page-Exit" Content="revealTrans(duration=3, transition=23)">
-    <title>About</title>
+    <title>URI</title>
     <meta name="description"
-          content="we are young we are strong">
+          content="">
 
     <link rel="stylesheet" href="http://yandex.st/highlightjs/7.1/styles/default.min.css">
 
@@ -18,7 +18,7 @@
     <script>hljs.initHighlightingOnLoad();</script>
 
     <link rel="stylesheet" href="/blog/css/main.css">
-    <link rel="canonical" href="http://zodiac-xl.github.io/blog/about/">
+    <link rel="canonical" href="http://zodiac-xl.github.io/blog/%E6%96%87%E6%A1%A3/2015/05/13/URI.html">
     <link rel="alternate" type="application/rss+xml" title="zodiac's blog"
           href="http://zodiac-xl.github.io/blog/rss.xml"/>
     <link href="http://zodiac-xl.github.io/blog/rss.xml" type="application/atom+xml"
@@ -137,17 +137,75 @@
     <div class="wrapper">
         <div class="post">
 
-    <header class="post-header">
-        <h1 class="post-title">About</h1>
-    </header>
-    <article class="post-content">
-        <p>This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at <a href="http://jekyllrb.com/">jekyllrb.com</a></p>
+  <header class="post-header">
+    <h1 class="post-title">URI</h1>
+    <p class="post-meta">May 13, 2015</p>
+  </header>
+  <div class="column-strip wiki-column" id="wiki-right">
+    <!-- table of contents -->
+    <div id="toc" class="toc toggleable">
+      <a href="#toc" class="title toggler" data-open-icon="icon-plus" data-closed-icon="icon-minus" aria-haspopup="true">在本文章中<i class="icon-minus"></i></a>
+    </div>
+  </div>
+  <article class="post-content">
+    <!--more-->
 
-<p>You can find the source code for the Jekyll new theme at: <a href="https://github.com/jglovier/jekyll-new">github.com/jglovier/jekyll-new</a></p>
 
-<p>You can find the source code for Jekyll at <a href="https://github.com/jekyll/jekyll">github.com/jekyll/jekyll</a></p>
+<h3>是URI，不是URL</h3>
 
-    </article>
+<blockquote><p>URL是uniform resource locator的缩写，是一个特定资源的协议（用什么方式去获取数据）和地址的组合。每一个公开可访问的资源，例如图片，JS文件，HTML文件或者样式 表文件，都有一个URL告诉浏览器从哪里下载它们。浏览器会根据这个URL建立一个链接，并开始下载或执行这个文件。</p>
+
+<p>URL其实也是个URI，URI是uniform resource identifier的缩写。URI指定了一个协议用来接收信息，包括一些关于资源的额外的信息。那些额外的信息可能是一个地址也可能不是（如果是的话， 那么URI就是URL了），但是它总是跟一个特定的协议和有关联。因此，既然不包含地址信息，data URI也就不是URL了。</p></blockquote>
+
+<h3>Data URI的格式</h3>
+
+<p>data URI的格式很简单。基本的格式如下：</p>
+
+<blockquote><p>data:[][;charset=][;base64],</p>
+
+<p>在这个格式中，data：URI的协议，表明这是一个data URI。第二部分，MIME type，表明了要呈现的数据的类型。拿PNG图片举个例子，它的MIME type是image/png。如果没有指定，MIME type将会默认为text/plain。charset在大多数情况下可以无视，对于图片来说它根本没用。下一部分指明了使用的编码。跟流行观念相反， 你不一定要用base 64编码。如果内容不是用base 64进行编码，那么这些数据就会使用标准的URL编码（对URL安全的ASCII字符将会保留原样显示，其他会显示成%xx格式的十六进制编码）进行编 码。编码后的数据可能会包含一些没用空格，</p></blockquote>
+
+<h3>Base 64编码</h3>
+
+<p>Base 64编 码是一个编码规则，通过它数据被转化成二进制码，然后组合成一个base 64符号的序列。</p>
+
+<blockquote><p>Base 64符号包括大写和小写的字母A到Z，数字，符号+和/。=号是用来填充用的。你真正需要知道的是 base 64编码会使编码过的数据变得更小。</p></blockquote>
+
+<p>下面的例子是一张GIF图片用base 64进行编码后的data URI（来源）：</p>
+
+<pre><code>data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge
+8WSLf/rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1h
+</code></pre>
+
+<p>data URI最有趣的地方是它可以让你把文件嵌入到其他文件中</p>
+
+<blockquote><p>内联图像使用了data URI把图像数据嵌入到页面中，会增加HTML文档的大小。把内联图像在（已缓存的）样式表里组合起来可以减少HTTP请求和避免页面大小的增加。内联图像还没有得到所有主流浏览器的支持。</p></blockquote>
+
+<p>图片预览也是通过将图片信息转化为base64使用uri实现的</p>
+
+<blockquote><p>input file change事件 FileReader获取 input.files(选取的文件) 在FileReader获加载器中获取文件详细信息</p>
+
+<p>这里e.target.result就是base64编码</p></blockquote>
+
+<pre><code>$( "input" ).bind( "change", function () {
+    var reader = new FileReader(), htmlImage;
+    reader.onload = function ( e ) {
+        htmlImage = '&lt;img src="' + e.target.result + '" /&gt;';
+        $( "body" ).append( htmlImage );
+    };
+    reader.readAsDataURL( $( this ).get( 0 ).files[0] );
+} )
+</code></pre>
+
+  </article>
+  <nav>
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/12/%E5%8E%9F%E5%9E%8B%E9%93%BE.html" title="原型链">&larr; Previous Post</a>
+    
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/14/%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6%E5%92%8C%E8%87%AA%E5%8A%A8%E4%B8%8B%E8%BD%BD%E6%96%87%E4%BB%B6.html" title="上传文件和自动下载文件">Next Post &rarr;</a>
+    
+  </nav>
 
 </div>
 

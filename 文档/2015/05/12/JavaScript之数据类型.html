@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Page-Exit" Content="revealTrans(duration=3, transition=23)">
+    <title>JavaScript之数据类型</title>
+    <meta name="description"
+          content="">
+
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/7.1/styles/default.min.css">
+
+    <script src="/blog/js/jquery-2.1.4.js"></script>
+
+    <script src="http://yandex.st/highlightjs/7.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" href="/blog/css/main.css">
+    <link rel="canonical" href="http://zodiac-xl.github.io/blog/%E6%96%87%E6%A1%A3/2015/05/12/JavaScript%E4%B9%8B%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B.html">
+    <link rel="alternate" type="application/rss+xml" title="zodiac's blog"
+          href="http://zodiac-xl.github.io/blog/rss.xml"/>
+    <link href="http://zodiac-xl.github.io/blog/rss.xml" type="application/atom+xml"
+          rel="alternate" title="zodiac's blog">
+    <link rel="shortcut icon" href="/blog/lib/img/xr.png"/>
+
+
+    <style>
+
+
+        .cdata, .comment, .doctype, .prolog {
+            color: #708090
+        }
+
+        .punctuation {
+            color: #999
+        }
+
+        .namespace {
+            opacity: .7
+        }
+
+        .boolean, .constant, .number, .property, .symbol, .tag {
+            color: #905
+        }
+
+        .attribute, .attr-name, .builtin, .selector, .string {
+            color: #690
+        }
+
+        .atrule, .attr-value, .keyword {
+            color: #07a
+        }
+
+        .function {
+            color: #DD4A68
+        }
+
+        .important, .regex {
+            color: #e90
+        }
+
+        .important {
+            font-weight: 700
+        }
+
+        .entity {
+            cursor: help
+        }
+
+        .key {
+            color: #960
+        }
+
+
+    </style>
+</head>
+
+
+<body>
+<header class="site-header">
+
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">zodiac's blog</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/blog/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <a class="page-link" href="/blog/categories/%E6%96%87%E6%A1%A3/index.html">文档</a>
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+  </div>
+</header>
+
+
+<div class="page-content">
+    <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">JavaScript之数据类型</h1>
+    <p class="post-meta">May 12, 2015</p>
+  </header>
+  <div class="column-strip wiki-column" id="wiki-right">
+    <!-- table of contents -->
+    <div id="toc" class="toc toggleable">
+      <a href="#toc" class="title toggler" data-open-icon="icon-plus" data-closed-icon="icon-minus" aria-haspopup="true">在本文章中<i class="icon-minus"></i></a>
+    </div>
+  </div>
+  <article class="post-content">
+    <!--more-->
+
+
+<h3>数据类型</h3>
+
+<p>JavaScript有5种简单数据类型（也称为基本数据类型）</p>
+
+<ul>
+<li>Undefined</li>
+<li>Null</li>
+<li>Boolean</li>
+<li>Number</li>
+<li>String</li>
+</ul>
+
+
+<p>1种复杂数据类型（也称为对象类型）</p>
+
+<ul>
+<li>Object 本质是由一组无序的名值对组成</li>
+</ul>
+
+
+<h3>typeof操作符</h3>
+
+<p>JavaScript是松散类型，不需要提前指定数据类型，因此需要一个方法来检测给定变量的数据类型</p>
+
+<p>对一个值使用typeof操作符可能返回下列字符串：</p>
+
+<ul>
+<li>"undefiend"-----值未定义message</li>
+<li>"boolean"----布尔值</li>
+<li>"string"----字符串</li>
+<li>"number"----数值</li>
+<li>"object"----对象(null也返回"object" 可以用来表示对象不存在，但本身属于NULL类型，并不不是object类型，是一个历史遗留问题)</li>
+<li>"function"----函数</li>
+</ul>
+
+
+<p>缺点：typeof会把所有的数组类型以及用户自定义类型判断为object</p>
+
+<p>优化：使用Object.prototype.toString()匹配出具体的数据类型</p>
+
+<p><code>Object.prototype.toString()</code>有一个妙用，如果我们以某个特别的对象为上下文来调用该函数，它会返回正确的类型。我们需要做的就是手动处理其返回的字符串，最终便能获得typeof应该返回的正确字符串。</p>
+
+<p>可以用来区分：<code>Boolean</code>, <code>Number</code>, <code>String</code>, <code>Function</code>, <code>Array</code>, <code>Date</code>, <code>RegExp</code>, <code>Object</code>, <code>Error</code>等等。</p>
+
+<p><code>jQuery.type()</code>就是这样实现的。以下代码从jQuery源码中抽取出来，可以直接用。</p>
+
+<pre><code>var class2type = {};
+"Boolean Number String Function Array Date RegExp Object Error".split( " " ).forEach( function ( e, i ) {
+    class2type["[object " + e + "]"] = e.toLowerCase();
+} );
+function _typeof( obj ) {
+    if ( obj == null ) {
+        return String( obj );
+    }
+    return typeof obj === "object" || typeof obj === "function" ?
+    class2type[class2type.toString.call( obj )] || "object" :
+            typeof obj;
+}
+</code></pre>
+
+<h3>construct 获取构造函数判断数据类型</h3>
+
+<p>因为typeof会把所有的数组类型以及用户自定义类型判断为object，从而无法知道更确切的信息。而constructor却可以解决这个问题。</p>
+
+<p>typeof可以检查到变量是否有定义，而construct是检查构造函数所以只能检查已定义变量的类型。</p>
+
+<pre><code>var i;
+alert(typeof(i)); //"undefined"
+alert(i.constructor);//报错 i is not defined
+</code></pre>
+
+<p>已定义变量调用construct属性返回的是一个构造函数</p>
+
+<pre><code>var i=1;
+alert(typeof(i)); //"number"
+alert(i.constructor);//function Number() { [native code] }
+</code></pre>
+
+<p>这样我们通过把construcor返回的构造函数转化为字符串，通过寻找匹配字符串（function名）就可以确定具体类型啦</p>
+
+<p>用基于constructor的方法去检查一些基本类型，如</p>
+
+<p>Object / Array / Function / String / Number / Boolean</p>
+
+<p>在你的正则表达式中，一定要将这些单词的首字母大写！！而如果该类型是自定义类型，则根据你定义的时候标识符的写法确定。如：</p>
+
+<pre><code>function user() {};
+var i = new user();
+alert(/user/.test(i.constructor));//true
+</code></pre>
+
+<p>缺点：因为是通过构造函数判断，所以通过原型链继承的情况，constuctor并不能准确判断</p>
+
+<h3>instanceof 获取实例判断数据类型</h3>
+
+<p>通常来讲，使用 instanceof 就是判断一个实例是否属于某种类型</p>
+
+<pre><code>function People(){}
+var dog = new People();
+console.log(dog instanceof People)//true
+</code></pre>
+
+<p>另外，更重的一点是 instanceof 可以在继承关系中用来判断一个实例是否属于它的父类型。例如：</p>
+
+<pre><code> // 判断 dog 是否是 Foo 类的实例 , 并且是否是其父类型的实例
+ function People(){}
+ function Dog(){}
+ Dog.prototype = new People();//JavaScript 原型继承
+
+ var dog = new Dog();
+ console.log(dog instanceof Dog)//true
+ console.log(dog instanceof People)//true
+</code></pre>
+
+<p>instanceof疑惑：</p>
+
+<pre><code> console.log(Object instanceof Object);//true
+ console.log(Object instanceof Function);//true
+ console.log(Function instanceof Object);//true
+ console.log(Function instanceof Function);//true
+ console.log(Number instanceof Number);//false
+ console.log(String instanceof String);//false
+
+ console.log(Function instanceof Object);//true
+
+ console.log(Foo instanceof Function);//true
+ console.log(Foo instanceof Foo);//false
+</code></pre>
+
+<p> 先看看 JavaScript instanceof 运算符思想：</p>
+
+<p> 左边L的隐式原型或者L的更父级的隐式原型 和 右边R的显示原型和相等才返回true</p>
+
+<p> 在原型链总说过JavaScript中一切皆为对象 所有数据类型包括function的最终父类都是Object</p>
+
+<p>而prototype属性是只有Object和Function及Function的实例才有的一个属性且均为Object {}；所以只有Object和Function及Function的实例instanceof才返回true</p>
+
+<pre><code>function instance_of(L, R) {//L 表示左表达式，R 表示右表达式
+    var O = R.prototype;// 取 R 的显示原型
+     L = L.__proto__;// 取 L 的隐式原型
+    while (true) {
+        if (L === null)
+          return false;
+        if (O === L)// 这里重点：当 O 严格等于 L 时，返回 true
+          return true;
+        L = L.__proto__;
+    }
+}
+</code></pre>
+
+<h3>Undefined类型</h3>
+
+<p>Undefined类型只有一个值，即特殊的undefined。在使用var声明了变量但未对其初始化时，这个变量的值就是undefined</p>
+
+<pre><code>var message;
+alert(message == undefined) //true
+</code></pre>
+
+<h3>Null类型</h3>
+
+<p>Null类型也只有一特殊的值是：null。null值表示一个空对象指针，所以typeof操作符检测null时会返回"object"</p>
+
+<pre><code>var message = null;
+alert(typeof message); // "object"
+</code></pre>
+
+<p>如果定义的变量准备在将来用于保存对象，那么最好将该变量初始化为null而不是其他值。这样一来，只要直接检测null值就可以知道相应的变量是否已经保存了一个对象的引用了，例如：</p>
+
+<pre><code>if(message != null)
+{
+    //执行某些操作
+}
+</code></pre>
+
+<p>实际上，undefined值是派生自null值的，因此ECMA-262规定对它们的相等性测试返回true。</p>
+
+<pre><code>alert(undefined == null); //true
+</code></pre>
+
+<p>尽管null和undefined有这样的关系，但它们的用途完全不同。无论在什么情况下都没有必要把一个变量的值显式地设置为undefined，可是同样的规则对null却不适用。</p>
+
+<ul>
+<li>undefined 如果变量是未定义 往往是没有数据或数据结构中没有此字段 基本可以认为是程序的不完善或错误 应尽量避免</li>
+<li>null 一般是人为设置 表示以后会用到这个变量 但是还未定义具体数据 一般用来占坑备用</li>
+</ul>
+
+
+<h3>Boolean类型</h3>
+
+<p>该类型只有两个字面值：true和false。</p>
+
+<p>虽然Boolean类型的字面值只有两个，但JavaScript中所有类型的值都有与这两个Boolean值等价的值。要将一个值转换为其对应的Boolean值，可以调用类型转换函数Boolean()</p>
+
+<pre><code>var message = 'Hello World';
+var messageAsBoolean = Boolean(message);
+</code></pre>
+
+<p> 各种数据类型及其对象的转换规则：</p>
+
+<table>
+<thead>
+<tr>
+<th>数据类型   </th>
+<th>   转换为true的值 </th>
+<th>   转换为false的值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Boolean    </td>
+<td>   true            </td>
+<td>   false</td>
+</tr>
+<tr>
+<td>String </td>
+<td>   任何非空字符串(包括"0")    </td>
+<td>""(空字符串)</td>
+</tr>
+<tr>
+<td>Number </td>
+<td>   任何非零数值（包括无穷大） </td>
+<td>0或NaN（NaN 与所有值都不相等，包括它自己）</td>
+</tr>
+<tr>
+<td>Object </td>
+<td>   任何非null对象     </td>
+<td>   null</td>
+</tr>
+<tr>
+<td>Undefined</td>
+<td> n/a（不适用）      </td>
+<td>   undefined</td>
+</tr>
+</tbody>
+</table>
+
+
+<h3>Number类型</h3>
+
+<p>Number类型用来表示整数和浮点数值</p>
+
+<p>还有一种特殊的数值，即NaN（非数值 Not a Number）。</p>
+
+<p>用于表示一个本来要返回数值的操作数未返回数值的情况（这样就不会抛出错误了）。</p>
+
+<p>例如:</p>
+
+<p>在其他编程语言中，任何数值除以或者余0都会导致错误，从而停止代码执行。但在JavaScript中，会溢出或者返回NaN，因此不会影响其他代码的执行。</p>
+
+<ul>
+<li>任何数字余0都返回NaN</li>
+<li>0除以0返回NaN 其他数字除以0要么上溢出(Infinity)要么下溢出(-Infinity)</li>
+</ul>
+
+
+<p>NaN的特点</p>
+
+<ul>
+<li>任何涉及NaN的操作（例如NaN/10）都会返回NaN</li>
+<li>NaN 与所有值都不相等，包括它自己</li>
+<li>NaN 属性用于引用特殊的非数字值。</li>
+<li>无法使用 for/in 循环来枚举 NaN 属性，也不能用 delete 运算符来删除它。</li>
+</ul>
+
+
+<p>JavaScript中有一个isNaN()函数，这个函数接受一个参数，该参数可以使任何类型，而函数会帮我们确定这个参数是否“不是数值”。isNaN()在接收一个值之后，会尝试将这个值转换为数值。某些不是数值的值会直接转换为数值。而任何不能被转换为数值的值都会导致这个函数返回true。例如：</p>
+
+<pre><code>alert(isNaN(NaN));    //true
+alert(isNaN(10));    //false(10是一个数值)
+alert(isNaN("10"));    //false(可能被转换为数值10)
+alert(isNaN("blue"));    //true(不能被转换为数值)
+alert(isNaN(true));    //false(可能被转换为数值1)
+</code></pre>
+
+<p>有3个函数可以把非数值转换为数值：Number()、parseInt()和parseFloat()。第一个函数，即转型函数Number()可以用于任何数据类型，而另外两个函数则专门用于把字符串转换成数值。这3个函数对于同样的输入会返回不同的结果。</p>
+
+<p>Number()函数的转换规则如下：</p>
+
+<ul>
+<li>如果是Boolean值，true和false将分别被替换为1和0</li>
+<li>如果是数字值，只是简单的传入和返回</li>
+<li>如果是null值，返回0</li>
+<li>如果是undefined，返回NaN</li>
+<li><p>如果是字符串，遵循下列规则：</p>
+
+<ul>
+<li>如果字符串中只包含数字，则将其转换为十进制数值，即”1“会变成1，”123“会变成123，而”011“会变成11（前导的0被忽略）</li>
+<li>如果字符串中只包含有效的浮点格式，如”1.1“，则将其转换为对应的浮点数（同样，也会忽略前导0）</li>
+<li>如果字符串中只包含有效的十六进制格式，例如”0xf“，则将其转换为相同大小的十进制整数值</li>
+<li>如果字符串是空的，则将其转换为0</li>
+<li>如果字符串中包含除了上述格式之外的字符，则将其转换为NaN</li>
+</ul>
+</li>
+<li><p>如果是对象，则调用对象的valueOf()方法,然后依照前面的规则转换返回的值。如果转换的结果是NaN，则调用对象的toString()方法，然后再依次按照前面的规则转换返回的字符串值。</p></li>
+</ul>
+
+
+<p>由于Number()函数在转换字符串时比较复杂而且不够合理，因此在处理整数的时候更常用的parseInt()函数。parseInt()函数在转换字符串时，更多的是看其是否符合数值模式。它会忽略字符串前面的空格，直至找到第一个非空格字符。如果第一个字符串不是数字字符或者负号，parseInt()会返回NaN；也就是说，用parseInt()转换空字符串会返回NaN。如果第一个字符是数字字符，praseInt()会继续解析第二个字符，知道解析完所有后续字符或者遇到了一个非数字字符。例如，"1234blue"会被转换为1234，”22.5“会被转换为22，因为小数点并不是有效的数字字符。</p>
+
+<p>如果字符串中的第一个字符是数字字符，parseInt()也能够识别出各种整数格式（即十进制、八进制、十六进制）</p>
+
+<pre><code>var num1 = parseInt("1234blue");    //1234
+var num2 = parseInt("");            //NaN
+var num3 = parseInt("0xA");            //10（十六进制）
+var num4 = parseInt("22.5");        //22
+var num5 = parseInt("070");            //56（八进制）
+var num6 = parseInt("70");            //70
+
+var num7 = parseInt("10",2);        //2（按二进制解析）
+var num8 = parseInt("10",8);        //8(按八进制解析)
+var num9 = parseInt("10",10);        //10（按十进制解析）
+var num10 = parseInt("10",16);        //16（按十六进制解析）
+var num11 = parseInt("70",8);            //56（按八进制）
+var num12 = parseInt("AF",16);        //175（按十六进制解析）
+</code></pre>
+
+<p>与parseInt()函数类似，parseFloat()也是从第一个字符（位置0）开始解析每个字符。而且也是一直解析到字符串末尾，或者解析到遇见一个无效的浮点数字字符为止。也就是说，字符串中的第一个小数点是有效的，而第二个小数点就是无效的了，因此它后面的字符串将被忽略。例如，”22.34.5“将会被转换成22.34。</p>
+
+<p>parseFloat()和parseInt()的第二个区别在于它始终都会忽略前导的零。所以parseFloat()只能解析十进制值，它没有用第二个参数指定基数的用法。</p>
+
+<pre><code>var num1 = parseFloat("1234blue");    //1234
+var num2 = parseFloat("0xA");        //0
+var num3 = parseFloat("22.5");        //22.5
+var num4 = parseFloat("22.34.5");    //22.34
+var num5 = parseFloat("0908.5");    //908.5
+</code></pre>
+
+<h3>String类型</h3>
+
+<p>String类型用于表示由零或多个16位Unicode字符组成的字符序列，即字符串。字符串可以由单引号('')或双引号("")表示。
+　</p>
+
+<p>toString()方法：</p>
+
+<p>数值、布尔值、对象和字符串值都有toString()方法。但null和undefined值没有这个方法。</p>
+
+<p>toString()方法可以指定基数，返回指定进制的字符串</p>
+
+<pre><code>var num = 10;
+alert(num.toString());      //"10"
+alert(num.toString(2));     //"1010"
+alert(num.toString(8));     //"12"
+alert(num.toString(10));    //"10"
+alert(num.toString(16));    //"a"
+</code></pre>
+
+<p>在不知道要转换的值是不是null或undefined的情况下，还可以使用转型函数String()，这个函数能够将任何类型的值转换为字符串。String()函数遵循下列转换规则：</p>
+
+<ul>
+<li>如果值有toString()方法，则调用该方法（没有参数）并返回相应的结果</li>
+<li>如果值是null，则返回"null"</li>
+<li>如果值是undefined，则返回”undefined“</li>
+</ul>
+
+
+<h3>Object类型</h3>
+
+<p>对象其实就是一组数据和功能的集合。对象可以通过执行new操作符后跟要创建的对象类型的名称或直接指定{}来创建。而创建Object类型的实例并为其添加属性和（或）方法，就可以创建自定义对象</p>
+
+<pre><code>var o = new Object();
+var oo = {};
+</code></pre>
+
+<p>Object的每个实例都具有下列属性和方法：</p>
+
+<ul>
+<li>constructor——保存着用于创建当前对象的函数</li>
+<li>hasOwnProperty(propertyName)——用于检查给定的属性在当前对象实例中（而不是在实例的原型中）是否存在。其中，作为参数的属性名(propertyName)必须以字符串形式指定（例如：o.hasOwnProperty("name")）</li>
+<li>isPrototypeOf(object)——用于检查传入的对象是否是一个对象的原型</li>
+<li>propertyIsEnumerable(propertyName)——用于检查给定的属性是否能够使用for-in语句来枚举</li>
+<li>toString()——返回对象的字符串表示</li>
+<li>valueOf()——返回对象的字符串、数值或布尔值表示。通常与toString()方法的返回值相同。</li>
+</ul>
+
+
+  </article>
+  <nav>
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/07/javaScript%E7%BB%A7%E6%89%BF.html" title="javaScript继承">&larr; Previous Post</a>
+    
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/12/%E5%8E%9F%E5%9E%8B%E9%93%BE.html" title="原型链">Next Post &rarr;</a>
+    
+  </nav>
+
+</div>
+
+    </div>
+</div>
+
+<div class="side-bar">
+    <a href="/blog/tag/css/" class="set-2">css</a> <a href="/blog/tag/html/" class="set-1">html</a> <a href="/blog/tag/js/" class="set-5">js</a> <a href="/blog/tag/%E8%B0%83%E8%AF%95/" class="set-1">调试</a>
+</div>
+
+<footer class="site-footer">
+    <div class="wrapper">
+        <div class="footer-col-wrapper">
+            <div class="footer-col  footer-col-1">
+                <ul class="contact-list">
+                    <li>zodiac's blog</li>
+                    <li><a href="mailto:wxlgame0105@gmail.com">wxlgame0105@gmail.com</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col  footer-col-2">
+                <ul class="social-media-list">
+                    
+                    <li>
+                        <a href="https://github.com/zodiac-xl">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                    <path fill="#828282"
+                          d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+                            <span class="username">zodiac-xl</span>
+                        </a>
+                    </li>
+                    
+
+                    
+                    <li>
+                        <a href="https://twitter.com/Zodiac_Wu">
+              <span class="icon  icon--twitter">
+                <svg viewBox="0 0 16 16">
+                    <path fill="#828282"
+                          d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/>
+                </svg>
+              </span>
+
+                            <span class="username">Zodiac_Wu</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </div>
+
+            <div class="footer-col  footer-col-3">
+                <p class="text">we are young we are strong</p>
+            </div>
+        </div>
+    </div>
+</footer>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-62360771-1', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+
+<script>
+    $(function () {
+        var hData = [];
+        var h3Index,
+                h4Index,
+                h5Index,
+                h3Tree,
+                h4Tree,
+                h5Tree;
+
+        h3Index = h4Index = h5Index = 0;
+        h3Tree = h4Tree = h5Tree = hData;
+
+
+        $("h3,h4,h5").each(function (i, el) {
+            var id,
+                    parentTree = hData;
+
+            switch (this.tagName) {
+                case "H3":
+                    id = "h3-" + String(h3Index++);
+                    parentTree = h3Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    h4Tree = h3Tree[h3Tree.length - 1].subTree;
+                    break;
+                case "H4":
+                    id = "h3-" + String(h3Index) + "_h4-" + String(h4Index++);
+                    parentTree = h4Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    h5Tree = h4Tree[h4Tree.length - 1].subTree;
+                    break;
+                case "H5":
+                    id = "h3-" + String(h3Index) + "_h4-" + String(h4Index) + "_h5-" + String(h5Index++);
+                    parentTree = h5Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    break;
+                default :
+                    break;
+            }
+
+            el.id = id;
+
+        });
+
+
+        function createUl(data, parent) {
+            var $ul = $("<ul></ul>");
+            $.each(data, function (index, item) {
+                var $li = $("<li><a href='#" + item.id + "'>" + item.name + "</a></li>");
+
+                if (item.subTree && item.subTree.length != 0) {
+                    createUl(item.subTree, $li);
+                }
+                $ul.append($li);
+            });
+            parent.append($ul);
+        }
+
+        createUl(hData, $("#toc"));
+    });
+</script>
+
+
+</body>
+</html>
+

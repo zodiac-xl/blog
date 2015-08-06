@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Page-Exit" Content="revealTrans(duration=3, transition=23)">
+    <title>css规范</title>
+    <meta name="description"
+          content="">
+
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/7.1/styles/default.min.css">
+
+    <script src="/blog/js/jquery-2.1.4.js"></script>
+
+    <script src="http://yandex.st/highlightjs/7.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <link rel="stylesheet" href="/blog/css/main.css">
+    <link rel="canonical" href="http://zodiac-xl.github.io/blog/%E6%96%87%E6%A1%A3/2015/05/22/JS%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7.html">
+    <link rel="alternate" type="application/rss+xml" title="zodiac's blog"
+          href="http://zodiac-xl.github.io/blog/rss.xml"/>
+    <link href="http://zodiac-xl.github.io/blog/rss.xml" type="application/atom+xml"
+          rel="alternate" title="zodiac's blog">
+    <link rel="shortcut icon" href="/blog/lib/img/xr.png"/>
+
+
+    <style>
+
+
+        .cdata, .comment, .doctype, .prolog {
+            color: #708090
+        }
+
+        .punctuation {
+            color: #999
+        }
+
+        .namespace {
+            opacity: .7
+        }
+
+        .boolean, .constant, .number, .property, .symbol, .tag {
+            color: #905
+        }
+
+        .attribute, .attr-name, .builtin, .selector, .string {
+            color: #690
+        }
+
+        .atrule, .attr-value, .keyword {
+            color: #07a
+        }
+
+        .function {
+            color: #DD4A68
+        }
+
+        .important, .regex {
+            color: #e90
+        }
+
+        .important {
+            font-weight: 700
+        }
+
+        .entity {
+            cursor: help
+        }
+
+        .key {
+            color: #960
+        }
+
+
+    </style>
+</head>
+
+
+<body>
+<header class="site-header">
+
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">zodiac's blog</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/blog/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <a class="page-link" href="/blog/categories/%E6%96%87%E6%A1%A3/index.html">文档</a>
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+  </div>
+</header>
+
+
+<div class="page-content">
+    <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">css规范</h1>
+    <p class="post-meta">May 22, 2015</p>
+  </header>
+  <div class="column-strip wiki-column" id="wiki-right">
+    <!-- table of contents -->
+    <div id="toc" class="toc toggleable">
+      <a href="#toc" class="title toggler" data-open-icon="icon-plus" data-closed-icon="icon-minus" aria-haspopup="true">在本文章中<i class="icon-minus"></i></a>
+    </div>
+  </div>
+  <article class="post-content">
+    <!--more-->
+
+
+<h3>惰性载入函数</h3>
+
+<p>提高性能方法原理：函数重新注册和自调用函数声明变量的方式定义函数2种方法</p>
+
+<pre><code>多数javascript包含大量if语句每次调用都判断的话 浪费性能 可使用惰性载入提高性能
+</code></pre>
+
+<h4>方法一：根据if条件直接将函数重新注册 这样if语句就只会第一次调用时判断了</h4>
+
+<pre><code>function createXHR() {
+    if ( window.XMLHttpRequest != "undefined" ) {
+        createXHR = function () {
+            return new XMLHttpRequest();
+        }
+    }
+    else if ( window.ActiveXObject != "undefined" ) {
+        createXHR = function () {
+
+            //高到低尝试创建IE ActiveXObject
+            if ( typeof  arguments.callee.activeXString != "string" ) {
+                var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0", "MSXML2.XMLHttp"],
+                        i, len;
+                for ( i = 0, len = versions.length; i++; i &lt; len ) {
+                    try {
+                        new ActiveXObject( versions[i] );
+                        arguments.callee.activeXString = versions[i];
+                        break;
+                    }
+                    catch ( ex ) {
+                        //跳过
+                    }
+                }
+            }
+            return new ActiveXObject( (arguments.callee.activeXString) );
+        };
+    }else{
+        createXHR = function () {
+            throw new Error( "No XHR Object available" );
+        }
+    }
+}
+</code></pre>
+
+<h4>方法2：自调用函数声明变量的方式定义函数</h4>
+
+<blockquote><p>根据if条件return函数 因为变量会被保存在内纯中 所以也只会在代码呗加载的时候判断一次  之后都会使用return保存的变量</p></blockquote>
+
+<pre><code>var createXHR = (function () {
+    if ( window.XMLHttpRequest != "undefined" ) {
+        return function () {
+            return new XMLHttpRequest();
+        };
+    }
+    else if ( window.ActiveXObject != "undefined" ) {
+        return function () {
+            if ( typeof  arguments.callee.activeXString != "string" ) {
+                var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0", "MSXML2.XMLHttp"],
+                        i, len;
+                for ( i = 0, len = versions.length; i++; i &lt; len ) {
+                    try {
+                        new ActiveXObject( versions[i] );
+                        arguments.callee.activeXString = versions[i];
+                        break;
+                    }
+                    catch ( ex ) {
+                        //跳过
+                    }
+                }
+            }
+            return new ActiveXObject( (arguments.callee.activeXString) );
+        };
+
+    }
+    else {
+        return function () {
+            throw new Error( "No XHR Object available" );
+        }
+    }
+})();
+</code></pre>
+
+<h3>函数绑定</h3>
+
+<p>创建一个函数，可以在特定的this环境中以指定参数调用另一个函数。该技巧常常和回调事件与事件处理器一起使用，以便将函数作为变量传递的同时保留代码执行环境</p>
+
+<h4>问题场景：</h4>
+
+<pre><code>var handler = {
+            message : "Event handled",
+            handleClick : function ( event ) {
+                alert( this.message );
+            }
+        },
+        body = document.querySelector( "body" );
+body.onclick = handler.handleClick;
+</code></pre>
+
+<blockquote><p>alert了一个undefined 原因在于handleClick的执行环境没有被保存 应该指向handler对象的this实例指向了body对象</p>
+
+<p>等同于body.onclick=function(){alert( this.message );}  this永远指向调用该表达式的对象</p></blockquote>
+
+<h4>解决方法 使用闭包保存环境  使用call apply在该环境下调用方法</h4>
+
+<pre><code>function bind( fn, context ) {
+        return function () {
+            return fn.apply( context, arguments );
+        }
+}
+
+W.addHandler( body, "click", bind( handler.handleClick, handler ) );
+</code></pre>
+
+<blockquote><p>bind()函数接受一个函数和一个环境 用来返回一个在给定环境中调用给定函数的函数，并且将参数原封不动传递</p>
+
+<p>bind函数在内部闭包 使用context的环境调用方法</p>
+
+<p>IE9+ chrome等开始支持原生bind 用法：handler.handleClick.bind(handler);</p></blockquote>
+
+<h3>函数柯里化(function curry)</h3>
+
+<p>函数柯里化基本方法和函数绑定一样：使用闭包返回一个函数。区别在于，在函数被调用时，返回的函数还需要设置一些传入的参数</p>
+
+<pre><code>function curry( fn ) {
+    var args = Array.prototype.slice.call( arguments, 1 );
+    return function () {
+        var innerArgs = Array.prototype.slice.call( arguments ),
+                finalArgs = args.concat( innerArgs );
+        return fn.apply( null, finalArgs );
+    }
+}
+
+function add( num1, num2 ) {
+    return num1 + num2;
+}
+
+//参数可以多次传递 以为最终都会合并成一个数组嘛
+var curriedAdd1 = curry( add, 5 );
+alert( curriedAdd1( 3 ) );  //8
+var curriedAdd2 = curry( add, 5, 3 );
+alert( curriedAdd2() );//8
+</code></pre>
+
+<blockquote><p>curry()函数主要工作是将被返回函数的参数进行排序。
+先用调用slice方法传入参数1 表示被返回的数组包含从第二个参数开始的所有参数
+在内部函数(即外部函数的第一个参数函数)中再用innerArgs数组存放所有传入的参数 最后将外部函数和内部函数的参数合并为finalArgs 以达到保存环境的作用</p></blockquote>
+
+<h4>函数绑定和柯里化一起使用</h4>
+
+<pre><code>function bindCurry( fn, context ) {
+    var args = Array.prototype.slice.call( arguments, 2 );
+    return function () {
+        var innerArgs = Array.prototype.slice.call( arguments ),
+                finalArgs = args.concat( innerArgs );
+        return fn.apply( context, finalArgs );
+    }
+}
+
+var handler1 = {
+    message : "Event handled",
+    handleClick : function ( name, event ) {
+        //alert( name + " : " + event.type );
+    }
+};
+W.addHandler( body, "click", bindCurry( handler1.handleClick, handler1, "my-click" ) );
+</code></pre>
+
+<h3>防篡改对象</h3>
+
+<h4>防篡改级别一:不可扩展的对象Object.preventExtensions()</h4>
+
+<blockquote><p>Object.preventExtensions()可以阻止向对象添加扩展  查看是否可扩展Object.isExtensible()</p>
+
+<p>默认情况下任何对象都是可自由扩展的 任何时候都可以向对象添加属性和方法</p></blockquote>
+
+<pre><code>var ob1 = {name : "zodiac"};
+   ob1.age = 22;
+   alert(ob1.age);//22
+
+   Object.preventExtensions( ob1 );
+   ob1.carrer = "font-end";
+   alert(ob1.carrer);//undefined
+   alert(Object.isExtensible(ob1));//false
+</code></pre>
+
+<h4>防篡改级别二:密封的对象Object.seal()</h4>
+
+<blockquote><p>设置Object.seal()后对象不仅不能扩展 已有成员的configurable（可配置的）也被设为false变为不可配置 不能删除改对象和它的属性和方法 也不能增加新的方法或属性 但可以修改</p>
+
+<p>Object.isSealed查看是否被密封</p></blockquote>
+
+<pre><code>   var ob2 = {name : "zodiac"};
+   Object.seal( ob2 );
+   ob2.name = "xl";
+   delete ob2.name;
+   alert(ob1.name);//xl
+   alert(Object.isExtensible(ob1));//false
+   alert(Object.isSealed(ob2));//true
+</code></pre>
+
+<h4>防篡改最高级别三:冻结的对象 Object.freeze()</h4>
+
+<blockquote><p>Object.isFrozen() 对Javascript库的作者而言 冻结对象可以保证库的和性对象不被修改</p>
+
+<p>即不可扩展 又是密封的 而且对象数据属性的[[Writable]]特性会被设置为false，如果定义了[[set]]函数，访问器的属性仍然可写</p></blockquote>
+
+<pre><code>var ob3 = {name : "zodiac"};
+Object.freeze( ob2 );
+ob3.name = "xl";
+delete ob2.name;
+alert(ob1.name);//zodiac
+alert(Object.isExtensible(ob1));//false
+alert(Object.isSealed(ob2));//true
+alert(Object.isFrozen(ob2));//true
+</code></pre>
+
+<blockquote><p>备注：手动修改对象的configurable（可配置的）或 [[Writable]] 属性是无效的</p></blockquote>
+
+<h3>高级计时器</h3>
+
+<p>javascript是单线程的 计时器仅仅只是计划代码在未来每个时间进行。执行时机不能保证 实际上浏览器负责进行排序，指派某段代码在某个时间点运行的优先级</p>
+
+<p>定时器对队列的工作方式是：在特定的时间后将代码插入。但并不意味着插入的代码会立刻执行。只是会排入队列尽快执行。</p>
+
+<h4>Yielding Processes生产过程</h4>
+
+<p>运行在浏览器的JavaScript被分配了一定数量的资源，被严格限制了内存大小和处理器时间 以防恶意web程序员搞挂计算机，如果代码运行时间超过特定时间或超过特定语句数量就会弹出错误</p>
+
+<p>解决方法：使用定时器分割处理长时间的循环等造成脚本运行时间较长的代码段</p>
+
+<pre><code>function chunk( array, process, context ) {
+
+
+    setTimeout( function () {
+        var item = array.shift();
+        process.call( context, item );
+
+        if ( array.length &gt; 0 ) {
+            setTimeout( arguments.callee, 100 );
+        }
+    }, 100 )
+}
+
+var data = [21, 1213, 31, 31, 31];
+
+function printValue( item ) {
+    document.querySelector( "body" ).innerHTML += item;
+}
+
+chunk( data, printValue );
+</code></pre>
+
+<blockquote><p>chunk函数将连续的代码分块较小间隔执行；
+array要处理的项目的数组，process处理项目的函数，context函数运行的环境当函数处于全局作用域时刻省略；直接传递数组，数组中的条目也会被改变，如果向保持原数组不变，可以传递该数组的克隆个函数data.concat()。</p></blockquote>
+
+<h4>函数节流 避免高频率触发 造成浏览器崩溃 只要代码是周期执行的都应该使用节流</h4>
+
+<blockquote><p>浏览器的某些计算和处理要比其他昂贵很多。
+ 如：DOM操作比非DOM交互需要更多的CPU和内存。连续尝试过多的DOM操作可能使浏览器挂起或崩溃。
+ 在IE中使用onresize处理事件时，当浏览器大小调整时会连续触发，可能导致浏览器崩溃，这类情况就可以使用定时器对该函数节流。</p></blockquote>
+
+<pre><code>function throttle( method, context ) {
+    clearTimeout( method.tId );
+    method.tId = setTimeout( function () {
+        method.call( context );
+    }, 100 )
+}
+
+function resize() {
+    document.querySelector( "body" ).innerHTML += "&lt;br/&gt;--------" + document.querySelector( "body" ).offsetWidth;
+}
+
+W.addHandler( window, "resize", function () {
+    throttle( resize );
+} );
+</code></pre>
+
+  </article>
+  <nav>
+    
+    <a href="/blog/%E6%96%87%E6%A1%A3/2015/05/20/%E7%A6%BB%E7%BA%BF%E5%BA%94%E7%94%A8%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AD%98%E5%82%A8.html" title="离线应用和客户端存储">&larr; Previous Post</a>
+    
+    
+  </nav>
+
+</div>
+
+    </div>
+</div>
+
+<div class="side-bar">
+    <a href="/blog/tag/css/" class="set-2">css</a> <a href="/blog/tag/html/" class="set-1">html</a> <a href="/blog/tag/js/" class="set-5">js</a> <a href="/blog/tag/%E8%B0%83%E8%AF%95/" class="set-1">调试</a>
+</div>
+
+<footer class="site-footer">
+    <div class="wrapper">
+        <div class="footer-col-wrapper">
+            <div class="footer-col  footer-col-1">
+                <ul class="contact-list">
+                    <li>zodiac's blog</li>
+                    <li><a href="mailto:wxlgame0105@gmail.com">wxlgame0105@gmail.com</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col  footer-col-2">
+                <ul class="social-media-list">
+                    
+                    <li>
+                        <a href="https://github.com/zodiac-xl">
+              <span class="icon  icon--github">
+                <svg viewBox="0 0 16 16">
+                    <path fill="#828282"
+                          d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                </svg>
+              </span>
+
+                            <span class="username">zodiac-xl</span>
+                        </a>
+                    </li>
+                    
+
+                    
+                    <li>
+                        <a href="https://twitter.com/Zodiac_Wu">
+              <span class="icon  icon--twitter">
+                <svg viewBox="0 0 16 16">
+                    <path fill="#828282"
+                          d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/>
+                </svg>
+              </span>
+
+                            <span class="username">Zodiac_Wu</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </div>
+
+            <div class="footer-col  footer-col-3">
+                <p class="text">we are young we are strong</p>
+            </div>
+        </div>
+    </div>
+</footer>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-62360771-1', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+
+<script>
+    $(function () {
+        var hData = [];
+        var h3Index,
+                h4Index,
+                h5Index,
+                h3Tree,
+                h4Tree,
+                h5Tree;
+
+        h3Index = h4Index = h5Index = 0;
+        h3Tree = h4Tree = h5Tree = hData;
+
+
+        $("h3,h4,h5").each(function (i, el) {
+            var id,
+                    parentTree = hData;
+
+            switch (this.tagName) {
+                case "H3":
+                    id = "h3-" + String(h3Index++);
+                    parentTree = h3Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    h4Tree = h3Tree[h3Tree.length - 1].subTree;
+                    break;
+                case "H4":
+                    id = "h3-" + String(h3Index) + "_h4-" + String(h4Index++);
+                    parentTree = h4Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    h5Tree = h4Tree[h4Tree.length - 1].subTree;
+                    break;
+                case "H5":
+                    id = "h3-" + String(h3Index) + "_h4-" + String(h4Index) + "_h5-" + String(h5Index++);
+                    parentTree = h5Tree;
+                    parentTree.push({
+                        name: this.innerText,
+                        id: id,
+                        subTree: []
+                    });
+                    break;
+                default :
+                    break;
+            }
+
+            el.id = id;
+
+        });
+
+
+        function createUl(data, parent) {
+            var $ul = $("<ul></ul>");
+            $.each(data, function (index, item) {
+                var $li = $("<li><a href='#" + item.id + "'>" + item.name + "</a></li>");
+
+                if (item.subTree && item.subTree.length != 0) {
+                    createUl(item.subTree, $li);
+                }
+                $ul.append($li);
+            });
+            parent.append($ul);
+        }
+
+        createUl(hData, $("#toc"));
+    });
+</script>
+
+
+</body>
+</html>
+
