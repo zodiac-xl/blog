@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "css规范"
+title:  "2015-05-18-浏览器查看一个元素动态绑定的事件"
 date:   2015-05-18 20:12:22
 categories: 文档
 tags: js
